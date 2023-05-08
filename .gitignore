@@ -1,0 +1,8 @@
+!.gitignore
+
+# visual studio files
+/.vscode/
+
+# python
+__pycache__/
+*.pyc
