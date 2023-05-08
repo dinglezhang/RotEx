@@ -1,6 +1,6 @@
 # rotation_helper
 
-**rotation_helper** is some functions to apply roatation, based on scipy.spatial.transform.Rotation.
+**rotation_helper** is some helper functions to apply rotation, based on scipy.spatial.transform.Rotation. And some tests on them.
 
 # Contents
 
@@ -13,7 +13,7 @@
 
 # Requirements
 
-- Numpy ( version>1.10 )
+- numpy ( version>1.10 )
 - scipy
 
 # Get started
