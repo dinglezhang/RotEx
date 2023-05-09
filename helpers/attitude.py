@@ -8,7 +8,7 @@ from . import new_frame
 EULER_D_FRAME_NED_2_ENU = np.array([-90, 180, 0])
 
 def att_ned_2_enu(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
-  att_d_enu_2_rfu = new_frame.euler_in_new_frame(att_d_ned_2_frd, EULER_D_FRAME_NED_2_ENU, 'ZYX')
+  att_d_enu_2_rfu = new_frame.euler_in_new_frame(att_d_ned_2_frd, EULER_D_FRAME_NED_2_ENU, 'ZYX', True)
   result = common.get_result(np.allclose(att_d_enu_2_rfu, expected_att_d_enu_2_rfu))
   print('***attitude from ned to enu: %s***' % result)
   print('body from ned to frd:\n%s' % att_d_ned_2_frd)
