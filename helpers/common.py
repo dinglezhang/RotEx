@@ -17,15 +17,15 @@ ROTATION_SEQUENCES = (\
   'zyz', 'zxz', 'yxy', 'yzy', 'xyx', 'xzx'\
 )
 
+logger = logging.getLogger()
+logger.setLevel('INFO')
+
+handler = logging.StreamHandler()
+fmtr = logging.Formatter(fmt="[%(asctime)s][%(filename)s:%(lineno)d][%(funcName)s()][%(levelname)s]: %(message)s")
+handler.setFormatter(fmtr)
+logger.addHandler(handler)
+
 def get_logger():
-  logger = logging.getLogger(__name__)
-  logger.setLevel('INFO')
-
-  handler = logging.StreamHandler()
-  fmtr = logging.Formatter(fmt="[%(asctime)s][%(filename)s:%(lineno)d][%(funcName)s()][%(levelname)s]: %(message)s")
-  handler.setFormatter(fmtr)
-  logger.addHandler(handler)
-
   return logger
 
 def get_result(is_passed):

@@ -1,12 +1,20 @@
 import numpy as np
 
+from helpers import common
 from helpers import attitude as att
 
+def test_one_att_ned_2_enu(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
+  att_d_enu_2_rfu = att.att_ned_2_enu(att_d_ned_2_frd, True)
+  result = common.get_result(np.allclose(att_d_enu_2_rfu, expected_att_d_enu_2_rfu))
+  print('***attitude from NED to ENU: %s***' % result)
+  print('body attitude from NED to FRD:\n%s' % att_d_ned_2_frd)
+  print('body attitude from ENU to RFU:\n%s\n' % att_d_enu_2_rfu)
+
 def test_att_ned_2_enu():
-  att.att_ned_2_enu(np.array([45, 0, 0]), np.array([-45, 0, 0]))
-  att.att_ned_2_enu(np.array([0, 45, 0]), np.array([0, 0, 45]))
-  att.att_ned_2_enu(np.array([0, 0, 45]), np.array([0, 45, 0]))
-  att.att_ned_2_enu(np.array([90, 45, 90]), np.array([0, 45, 90]))
+  test_one_att_ned_2_enu(np.array([45, 0, 0]), np.array([-45, 0, 0]))
+  test_one_att_ned_2_enu(np.array([0, 45, 0]), np.array([0, 0, 45]))
+  test_one_att_ned_2_enu(np.array([0, 0, 45]), np.array([0, 45, 0]))
+  test_one_att_ned_2_enu(np.array([90, 45, 90]), np.array([0, 45, 90]))
 
 def test_att_enu_2_rfu_by_delta_xyz():
   print('============================test att from enu to rfu by delta xyz and roll============================')

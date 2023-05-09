@@ -5,14 +5,32 @@ from scipy.spatial.transform import Rotation
 from . import common
 from . import new_frame
 
-EULER_D_FRAME_NED_2_ENU = np.array([-90, 180, 0])
+logger = common.get_logger()
 
-def att_ned_2_enu(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
-  att_d_enu_2_rfu = new_frame.euler_in_new_frame(att_d_ned_2_frd, EULER_D_FRAME_NED_2_ENU, 'ZYX', True)
-  result = common.get_result(np.allclose(att_d_enu_2_rfu, expected_att_d_enu_2_rfu))
-  print('***attitude from ned to enu: %s***' % result)
-  print('body from ned to frd:\n%s' % att_d_ned_2_frd)
-  print('body from enu to rfu:\n%s\n' % att_d_enu_2_rfu)
+EULER_D_FRAME_NED_2_ENU = np.array([-90, 180, 0])
+EULER_R_FRAME_NED_2_ENU = EULER_D_FRAME_NED_2_ENU * common.D2R
+
+'''
+Get attitude in ENU (East, North, Up) frame from NED (North, East, Down) frame.
+
+Args:
+  att_ned_2_frd: body attitude FRD (Front, Right, Down) in NED frame
+  is_degree: True is degree, False is radian
+Return:
+  body attitude RFU (Right, Front, Up) in ENU frame
+'''
+def att_ned_2_enu(att_ned_2_frd, is_degree):
+  euler_frame_ned_2_enu = EULER_D_FRAME_NED_2_ENU
+  unit = 'deg'
+  if not is_degree:
+    euler_frame_ned_2_enu = EULER_R_FRAME_NED_2_ENU
+    unit = 'rad'
+
+  logger.info('body attitude FRD in NED frame: euler(%s)%s' % (unit, att_ned_2_frd))
+  att_enu_2_rfu = new_frame.euler_in_new_frame(att_ned_2_frd, euler_frame_ned_2_enu, 'ZYX', is_degree)
+  logger.info('body attitude RFU in ENU frame: euler(%s)%s' % (unit, att_enu_2_rfu))
+
+  return att_enu_2_rfu
 
 '''
   rotation from enu (navigation frame) to rfu (body frame), enu / rfu is xyz of coordinates
