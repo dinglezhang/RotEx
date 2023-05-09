@@ -7,8 +7,21 @@ from . import new_frame
 
 logger = common.get_logger()
 
-EULER_D_FRAME_NED_2_ENU = np.array([-90, 180, 0])
-EULER_R_FRAME_NED_2_ENU = EULER_D_FRAME_NED_2_ENU * common.D2R
+'''
+  NED_2_ENU and ENU_2_NED are actually the same rotation.
+  So define NED_X_ENU which means to exchange each other
+'''
+EULER_D_FRAME_NED_X_ENU = np.array([-90, 180, 0])
+EULER_R_FRAME_NED_X_ENU = EULER_D_FRAME_NED_X_ENU * common.D2R
+
+def att_ned_x_enu(att_old_frame, is_degree):
+  euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU
+  if not is_degree:
+    euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU
+
+  att_new_frame = new_frame.euler_in_new_frame(att_old_frame, euler_frame_ned_x_enu, 'ZYX', is_degree)
+
+  return att_new_frame
 
 '''
 Get attitude in ENU (East, North, Up) frame from NED (North, East, Down) frame.
@@ -20,17 +33,35 @@ Return:
   body attitude RFU (Right, Front, Up) in ENU frame
 '''
 def att_ned_2_enu(att_ned_2_frd, is_degree):
-  euler_frame_ned_2_enu = EULER_D_FRAME_NED_2_ENU
   unit = 'deg'
   if not is_degree:
-    euler_frame_ned_2_enu = EULER_R_FRAME_NED_2_ENU
     unit = 'rad'
 
   logger.info('body attitude FRD in NED frame: euler(%s)%s' % (unit, att_ned_2_frd))
-  att_enu_2_rfu = new_frame.euler_in_new_frame(att_ned_2_frd, euler_frame_ned_2_enu, 'ZYX', is_degree)
+  att_enu_2_rfu = att_ned_x_enu(att_ned_2_frd, is_degree)
   logger.info('body attitude RFU in ENU frame: euler(%s)%s' % (unit, att_enu_2_rfu))
 
   return att_enu_2_rfu
+
+'''
+Get attitude in NED (North, East, Down) frame from ENU (East, North, Up) frame.
+
+Args:
+  att_enu_2_rfu: body attitude RFU (Right, Front, Up) in NED frame
+  is_degree: True is degree, False is radian
+Return:
+  body attitude FRD (Front, Right, Down) in NED frame
+'''
+def att_enu_2_ned(att_enu_2_rfu, is_degree):
+  unit = 'deg'
+  if not is_degree:
+    unit = 'rad'
+
+  logger.info('body attitude RFU in ENU frame: euler(%s)%s' % (unit, att_enu_2_rfu))
+  att_ned_2_frd = att_ned_x_enu(att_enu_2_rfu, is_degree)
+  logger.info('body attitude FRD in NED frame: euler(%s)%s' % (unit, att_ned_2_frd))
+
+  return att_ned_2_frd
 
 '''
   rotation from enu (navigation frame) to rfu (body frame), enu / rfu is xyz of coordinates

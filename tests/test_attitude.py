@@ -10,11 +10,23 @@ def test_one_att_ned_2_enu(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
   print('body attitude from NED to FRD:\n%s' % att_d_ned_2_frd)
   print('body attitude from ENU to RFU:\n%s\n' % att_d_enu_2_rfu)
 
-def test_att_ned_2_enu():
+def test_one_att_enu_2_ned(att_d_enu_2_rfu, expected_att_d_ned_2_frd):
+  att_d_ned_2_frd = att.att_enu_2_ned(att_d_enu_2_rfu, True)
+  result = common.get_result(np.allclose(att_d_ned_2_frd, expected_att_d_ned_2_frd))
+  print('***attitude from ENU to NED: %s***' % result)
+  print('body attitude from ENU to RFU:\n%s' % att_d_enu_2_rfu)
+  print('body attitude from NED to FRD:\n%s\n' % att_d_ned_2_frd)
+
+def test_att_ned_x_enu():
   test_one_att_ned_2_enu(np.array([45, 0, 0]), np.array([-45, 0, 0]))
   test_one_att_ned_2_enu(np.array([0, 45, 0]), np.array([0, 0, 45]))
   test_one_att_ned_2_enu(np.array([0, 0, 45]), np.array([0, 45, 0]))
   test_one_att_ned_2_enu(np.array([90, 45, 90]), np.array([0, 45, 90]))
+
+  test_one_att_enu_2_ned(np.array([-45, 0, 0]), np.array([45, 0, 0]))
+  test_one_att_enu_2_ned(np.array([0, 0, 45]), np.array([0, 45, 0]))
+  test_one_att_enu_2_ned(np.array([0, 45, 0]), np.array([0, 0, 45]))
+  test_one_att_enu_2_ned(np.array([0, 45, 90]), np.array([90, 45, 90]))
 
 def test_att_enu_2_rfu_by_delta_xyz():
   print('============================test att from enu to rfu by delta xyz and roll============================')
@@ -37,6 +49,6 @@ def test_delta_att():
   att.delta_att(att_d_input_1, att_d_input_2, 'zyx')
 
 def test():
-  test_att_ned_2_enu()
+  test_att_ned_x_enu()
   test_att_enu_2_rfu_by_delta_xyz()
   test_delta_att()
