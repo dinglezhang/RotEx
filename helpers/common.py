@@ -1,3 +1,4 @@
+import logging
 import math
 
 D2R = math.pi/180.0
@@ -15,6 +16,17 @@ ROTATION_SEQUENCES = (\
   # two axis rotation
   'zyz', 'zxz', 'yxy', 'yzy', 'xyx', 'xzx'\
 )
+
+def get_logger():
+  logger = logging.getLogger(__name__)
+  logger.setLevel('INFO')
+
+  handler = logging.StreamHandler()
+  fmtr = logging.Formatter(fmt="[%(asctime)s][%(filename)s:%(lineno)d][%(funcName)s()][%(levelname)s]: %(message)s")
+  handler.setFormatter(fmtr)
+  logger.addHandler(handler)
+
+  return logger
 
 def get_result(is_passed):
   global PASSED_COUNT
