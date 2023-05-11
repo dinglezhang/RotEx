@@ -65,14 +65,26 @@ def test_att_enu_2_rfu_by_delta_xyz():
 
   #[ToDo] add more test on vectors other than heading_north
 
+def test_one_delta_att(att_d_1, att_d_2, rot_seq):
+  print('============================test one delta attitude============================')
+
+  delta_att_d = att.delta_att(att_d_1, att_d_2, rot_seq, True)
+
+  rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
+  delta_rot = Rotation.from_euler(rot_seq, delta_att_d, True)
+  rot2_calc = rot1 * delta_rot
+
+  att_d_2_calc = rot2_calc.as_euler(rot_seq, True)
+  result = common.get_result(np.allclose(att_d_2_calc, att_d_2))
+  print('***attitude 2 by %s sequence after rotation by delta attitude: %s***' % (rot_seq, result))
+  print('euler(deg) expected: %s' % att_d_2)
+  print('euler(deg) rotated: %s\n' % att_d_2_calc)
+
 def test_delta_att():
-  print('============================test delta att============================')
-
-  att_d_input_1 = np.array([10, 1, 4])
-  att_d_input_2 = np.array([11, 10, 5])
-
-  att.delta_att(att_d_input_1, att_d_input_2, 'ZYX')
-  att.delta_att(att_d_input_1, att_d_input_2, 'zyx')
+  att_d_1 = np.array([10, 1, 4])
+  att_d_2 = np.array([11, 2, 5])
+  test_one_delta_att(att_d_1, att_d_2, 'ZYX')
+  test_one_delta_att(att_d_1, att_d_2, 'zyx')
 
 def test():
   test_att_ned_x_enu()

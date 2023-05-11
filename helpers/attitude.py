@@ -125,32 +125,30 @@ def att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, roll_y, is_degree):
 
   return att
 
-def delta_att(att_d_input_1, att_d_input_2, rot_seq):
-  logger.info('~~~~~~~~~~delta att~~~~~~~~~~')
+'''
+Get delta between two attitudes.
 
-  att_r_input_1 = att_d_input_1 * common.D2R
-  att_r_input_2 = att_d_input_2 * common.D2R
-  logger.info('att input by %s sequence:' % rot_seq)
-  logger.info('%s (%s)' % (att_d_input_1, att_r_input_1))
-  logger.info('%s (%s)\n' % (att_d_input_2, att_r_input_2))
+Args:
+  att1, att2: two attitudes
+  rot_seq: euler angles rotation sequence
+  is_degree: True is degree, False is radian
+Return:
+  delta between two attitudes
+'''
+def delta_att(att1, att2, rot_seq, is_degree):
+  angle_unit = common.get_angle_unit(is_degree)
+  logger.info('two attitudes input by %s sequence:' % rot_seq)
+  logger.info('euler1(%s)%s' % (angle_unit, att1))
+  logger.info('euler2(%s)%s' % (angle_unit, att2))
 
-  rot1 = Rotation.from_euler(rot_seq, att_r_input_1)
-  rot2 = Rotation.from_euler(rot_seq, att_r_input_2)
+  rot1 = Rotation.from_euler(rot_seq, att1, is_degree)
+  rot2 = Rotation.from_euler(rot_seq, att2, is_degree)
 
   delta_rot = rot1.inv() * rot2
 
-  delta_att_d = delta_rot.as_euler(rot_seq, True)
-  delta_att_r = delta_rot.as_euler(rot_seq)
-  logger.info('delta att by %s sequence :' % rot_seq)
-  logger.info('%s (%s)' % (delta_att_d, delta_att_r))
+  delta_att = delta_rot.as_euler(rot_seq, is_degree)
+  logger.info('delta attitude by %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_att))
 
-  #euler_in_new_frame(delta_rot.as_euler(rot_seq, True), att_d_input_1, rot_seq)
+  #[ToDo] euler_in_new_frame(delta_rot.as_euler(rot_seq, True), att_d_input_1, rot_seq)
 
-  # test
-  rot2_cal = rot1 * delta_rot
-  att_d_2_cal = rot2_cal.as_euler(rot_seq, True)
-  att_r_2_cal = rot2_cal.as_euler(rot_seq)
-  logger.info('att2 calculated by %s sequence :' % rot_seq)
-  logger.info('%s (%s)' % (att_d_2_cal, att_r_2_cal))
-  result = common.get_result(np.allclose(att_d_2_cal, att_d_input_2))
-  logger.info('***att_d_input_2 vs att_d_cal_2: %s***\n' % result)
+  return delta_att
