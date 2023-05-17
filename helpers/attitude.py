@@ -2,10 +2,10 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from . import common
+from . import util
 from . import new_frame
 
-logger = common.get_logger()
+logger = util.get_logger()
 
 '''
   Attitude is a set of euler angles how a body intrinsic rotates from the navigation frame to its current body frame.
@@ -24,7 +24,7 @@ logger = common.get_logger()
   So define NED_X_ENU which means to exchange each other
 '''
 EULER_D_FRAME_NED_X_ENU = np.array([-90, 180, 0])
-EULER_R_FRAME_NED_X_ENU = EULER_D_FRAME_NED_X_ENU * common.D2R
+EULER_R_FRAME_NED_X_ENU = EULER_D_FRAME_NED_X_ENU * util.D2R
 
 def att_ned_x_enu(att_old_frame, is_degree):
   euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU
@@ -45,9 +45,9 @@ Return:
   body attitude RFU in ENU frame
 '''
 def att_ned_2_enu(att_ned_2_frd, is_degree):
-  logger.info('attitude FRD in NED frame: euler(%s)%s' % (common.get_angle_unit(is_degree), att_ned_2_frd))
+  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_ned_2_frd))
   att_enu_2_rfu = att_ned_x_enu(att_ned_2_frd, is_degree)
-  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (common.get_angle_unit(is_degree), att_enu_2_rfu))
+  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_enu_2_rfu))
 
   return att_enu_2_rfu
 
@@ -61,9 +61,9 @@ Return:
   body attitude FRD in NED frame
 '''
 def att_enu_2_ned(att_enu_2_rfu, is_degree):
-  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (common.get_angle_unit(is_degree), att_enu_2_rfu))
+  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_enu_2_rfu))
   att_ned_2_frd = att_ned_x_enu(att_enu_2_rfu, is_degree)
-  logger.info('attitude FRD in NED frame: euler(%s)%s' % (common.get_angle_unit(is_degree), att_ned_2_frd))
+  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_ned_2_frd))
 
   return att_ned_2_frd
 
@@ -89,7 +89,7 @@ def att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, roll_y, is_degree):
   rot = Rotation.from_euler("ZXY", att_r_ZXY, False)
 
   att_ZYX = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude by ZYX sequence: euler(%s)%s' % (common.get_angle_unit(is_degree), att_ZYX))
+  logger.info('attitude by ZYX sequence: euler(%s)%s' % (util.get_angle_unit(is_degree), att_ZYX))
 
   return att_ZYX
 
@@ -121,7 +121,7 @@ def att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, roll_y, is_degree):
 
   rot = Rotation.from_rotvec(vertical_rotvec)
   att = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude by ZYX sequence: euler(%s)%s' % (common.get_angle_unit(is_degree), att))
+  logger.info('attitude by ZYX sequence: euler(%s)%s' % (util.get_angle_unit(is_degree), att))
 
   return att
 
@@ -136,7 +136,7 @@ Return:
   delta between two attitudes
 '''
 def delta_att(att1, att2, rot_seq, is_degree):
-  angle_unit = common.get_angle_unit(is_degree)
+  angle_unit = util.get_angle_unit(is_degree)
   logger.info('two attitudes input by %s sequence:' % rot_seq)
   logger.info('euler1(%s)%s' % (angle_unit, att1))
   logger.info('euler2(%s)%s' % (angle_unit, att2))

@@ -1,16 +1,15 @@
 import numpy as np
 
-from helpers import common
-
-from tests import test_euler_2_x as e2x
-from tests import test_rotate_vectors as rv
-from tests import test_attitude as att
+from tests import test_util
+from tests import test_euler_2_x
+from tests import test_rotate_vectors
+from tests import test_attitude
 
 if __name__ == '__main__':
   np.set_printoptions(precision = 8, suppress = True)
 
-  e2x.test()
-  rv.test()
-  att.test()
+  test_euler_2_x.test()
+  test_rotate_vectors.test()
+  test_attitude.test()
 
-  print('\n%s: %s\n%s: %s' % (common.PASSED_STR, common.PASSED_COUNT, common.FAILED_STR, common.FAILED_COUNT))
+  print('\n%s: %s\n%s: %s' % (test_util.PASSED_STR, test_util.PASSED_COUNT, test_util.FAILED_STR, test_util.FAILED_COUNT))
