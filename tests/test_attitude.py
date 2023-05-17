@@ -52,16 +52,16 @@ def test_att_enu_2_rfu_by_delta_xyz():
   heading_rotated_through_euler = rot_through_euler.apply(heading_north)
   result = common.get_result(np.allclose(heading_expected, heading_rotated_through_euler))
   print('***heading through euler: %s***' % result)
-  print('heading expected: %s' % heading_expected)
-  print('heading rotated: %s\n' % heading_rotated_through_euler)
+  print('expected: %s' % heading_expected)
+  print('rotated: %s\n' % heading_rotated_through_euler)
 
   att_d_through_rotvec = att.att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, roll_y, True)
   rot_through_rotvec = Rotation.from_euler("ZYX", att_d_through_rotvec, True)
   heading_rotated_through_rotvec = rot_through_rotvec.apply(heading_north)
   result = common.get_result(np.allclose(heading_expected, heading_rotated_through_rotvec))
   print('***heading through vertical rotvec: %s***' % result)
-  print('heading expected: %s' % heading_expected)
-  print('heading rotated: %s\n' % heading_rotated_through_rotvec)
+  print('expected: %s' % heading_expected)
+  print('rotated: %s\n' % heading_rotated_through_rotvec)
 
   #[ToDo] add more test on vectors other than heading_north
 

@@ -149,6 +149,6 @@ def delta_att(att1, att2, rot_seq, is_degree):
   delta_att = delta_rot.as_euler(rot_seq, is_degree)
   logger.info('delta attitude by %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_att))
 
-  #[ToDo] euler_in_new_frame(delta_rot.as_euler(rot_seq, True), att_d_input_1, rot_seq)
+  #[ToDo] delta_att = new_frame.euler_in_new_frame(delta_att, att2, rot_seq, is_degree)
 
   return delta_att
