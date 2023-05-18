@@ -1,19 +1,22 @@
-# rotation_helper
+# EasyEuler
 
-**rotation_helper** is some helper functions to apply rotation, based on scipy.spatial.transform.Rotation. And some tests on them.
+**EasyEuler** is a set of helper functions to apply 3D rotation, especially Euler Angles, based on scipy.spatial.transform.Rotation.
+You can learn, understand and test Rotation quickly, and use these functions in your codes easily.
+
+Make Euler Angles easy, not dizzy!
 
 # Contents
 
-------
-
-- [rotation\_helper](#rotation_helper)
+- [EasyEuler](#easyeuler)
 - [Contents](#contents)
 - [Requirements](#requirements)
 - [Get started](#get-started)
 
 # Requirements
 
-- numpy ( version>1.10 )
+- numpy
 - scipy
 
 # Get started
+
+Run test.py in the root. It calls tests on all functions provided in helpers folder.
