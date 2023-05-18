@@ -4,12 +4,13 @@ import math
 D2R = math.pi/180.0
 R2D = 180.0/math.pi
 
-ROTATION_SEQUENCES = (\
+ROTATION_SEQUENCES_INTRINSIC = [\
   # three axis rotation
-  'zyx', 'zxy', 'yxz', 'yzx', 'xyz', 'xzy', \
+  'ZYX', 'ZXY', 'YXZ', 'YZX', 'XYZ', 'XZY', \
   # two axis rotation
-  'zyz', 'zxz', 'yxy', 'yzy', 'xyx', 'xzx'\
-)
+  'ZYZ', 'ZXZ', 'YXY', 'YZY', 'XYX', 'XZX'\
+]
+ROTATION_SEQUENCES_EXTRINSIC = [element.lower() for element in ROTATION_SEQUENCES_INTRINSIC]
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
