@@ -24,7 +24,7 @@ logger = util.get_logger()
   So define NED_X_ENU which means to exchange each other
 '''
 EULER_D_FRAME_NED_X_ENU = np.array([-90, 180, 0])
-EULER_R_FRAME_NED_X_ENU = EULER_D_FRAME_NED_X_ENU * util.D2R
+EULER_R_FRAME_NED_X_ENU = np.deg2rad(EULER_D_FRAME_NED_X_ENU)
 
 def att_ned_x_enu(att_old_frame, is_degree):
   euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU

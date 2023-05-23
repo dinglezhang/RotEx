@@ -1,9 +1,6 @@
 import logging
 import math
 
-D2R = math.pi/180.0
-R2D = 180.0/math.pi
-
 ROTATION_SEQUENCES_INTRINSIC = [\
   # three axis rotation
   'ZYX', 'ZXY', 'YXZ', 'YZX', 'XYZ', 'XZY', \
