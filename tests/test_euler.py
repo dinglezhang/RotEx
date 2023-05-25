@@ -11,7 +11,7 @@ Print all kinds of expression of a rotation by euler angles.
 Args:
   euler: euler angles to rotate
   rot_seq: euler angles rotation sequence
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for both input and output eulers
 Return:
   None
 '''
@@ -51,7 +51,7 @@ Rotate by euler angles once or 3 times one by one, and test if they get the same
 Args:
   euler: euler angles to rotate
   rot_seq: euler angles rotation sequence
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for input euler
 Return:
   None
 '''

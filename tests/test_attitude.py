@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation, RotationSpline
 
 from helpers import attitude as att
 from . import test_util
@@ -68,17 +68,16 @@ def test_att_enu_2_rfu_by_delta_xyz():
 def test_one_delta_att(att_d_1, att_d_2, rot_seq):
   print('============================test one delta attitude============================')
 
-  delta_att_d = att.delta_att(att_d_1, att_d_2, rot_seq, True)
+  (delta_rot, delta_euler_d) = att.delta_att(att_d_1, att_d_2, rot_seq, True)
 
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
-  delta_rot = Rotation.from_euler(rot_seq, delta_att_d, True)
   rot2_calc = rot1 * delta_rot
 
   att_d_2_calc = rot2_calc.as_euler(rot_seq, True)
   result = test_util.get_result(np.allclose(att_d_2_calc, att_d_2))
-  print('***attitude 2 by %s sequence after rotation by delta attitude: %s***' % (rot_seq, result))
-  print('euler(deg) expected: %s' % att_d_2)
-  print('euler(deg) rotated: %s\n' % att_d_2_calc)
+  print('***att2(deg) by %s sequence after rotation by delta euler: %s***' % (rot_seq, result))
+  print('expected: %s' % att_d_2)
+  print('rotated: %s\n' % att_d_2_calc)
 
 def test_delta_att():
   att_d_1 = np.array([10, 1, 4])
@@ -86,7 +85,32 @@ def test_delta_att():
   test_one_delta_att(att_d_1, att_d_2, 'ZYX')
   test_one_delta_att(att_d_1, att_d_2, 'zyx')
 
+def test_one_angular_rate(delta_time, att_d_1, att_d_2, rot_seq):
+  print('============================test one angular rate============================')
+
+  angular_rate = att.angular_rate(delta_time, att_d_1, att_d_2, rot_seq, True)
+
+  times = [0, delta_time]
+  angles = [att_d_1, att_d_2]
+  rotations = Rotation.from_euler(rot_seq, angles, True)
+
+  spline = RotationSpline(times, rotations)
+  angular_rate_spline = spline(times, 1)[1]
+  angular_rate_spline = np.rad2deg(angular_rate_spline)
+
+  result = test_util.get_result(np.allclose(angular_rate_spline, angular_rate))
+  print('***angular rate: %s***' % result)
+  print('spline: %s' % angular_rate_spline)
+  print('actual: %s\n' % angular_rate)
+
+def test_angular_rate():
+  att_d_1 = np.array([10, 1, 4])
+  att_d_2 = np.array([11, 2, 5])
+  test_one_angular_rate(2, att_d_1, att_d_2, 'ZYX')
+  test_one_angular_rate(3, att_d_1, att_d_2, 'zyx')
+
 def test():
   test_att_ned_x_enu()
   test_att_enu_2_rfu_by_delta_xyz()
   test_delta_att()
+  test_angular_rate()

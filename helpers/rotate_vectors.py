@@ -43,7 +43,7 @@ Args:
   vectors: vectors to be rotated
   euler: euler angles to rotate
   rot_seq: euler angles rotation sequence
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for input euler
   times: times to apply the rotation
   on_frame: True is to rotate frame, False is to rotate vectors
 Return:

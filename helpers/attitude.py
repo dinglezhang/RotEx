@@ -8,9 +8,9 @@ from . import new_frame
 logger = util.get_logger()
 
 '''
-  Attitude is a set of euler angles how a body intrinsic rotates from the navigation frame to its current body frame.
+  Attitude is a set of euler angles how a body intrinsic rotates from the world frame to its current body frame.
 
-  Navigation frame (xyz coordinates):
+  World frame (xyz coordinates):
     ENU (East, North, Up)`
     NED (North, East, Down)
 
@@ -21,15 +21,15 @@ logger = util.get_logger()
 
 '''
   NED_2_ENU and ENU_2_NED are actually the same rotation.
-  So define NED_X_ENU which means to exchange each other
+  So define NED_X_ENU which means to exchange each other, which rotation sequence is 'ZYX'
 '''
-EULER_D_FRAME_NED_X_ENU = np.array([-90, 180, 0])
-EULER_R_FRAME_NED_X_ENU = np.deg2rad(EULER_D_FRAME_NED_X_ENU)
+EULER_D_FRAME_NED_X_ENU_ZYX = np.array([-90, 180, 0])
+EULER_R_FRAME_NED_X_ENU_ZYX = np.deg2rad(EULER_D_FRAME_NED_X_ENU_ZYX)
 
 def att_ned_x_enu(att_old_frame, is_degree):
-  euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU
+  euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU_ZYX
   if not is_degree:
-    euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU
+    euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU_ZYX
 
   att_new_frame = new_frame.euler_in_new_frame(att_old_frame, euler_frame_ned_x_enu, 'ZYX', is_degree)
 
@@ -40,7 +40,7 @@ Get attitude in ENU frame from NED frame.
 
 Args:
   att_ned_2_frd: body attitude FRD in NED frame
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for both input and output attitudes
 Return:
   body attitude RFU in ENU frame
 '''
@@ -56,7 +56,7 @@ Get attitude in NED frame from ENU frame.
 
 Args:
   att_enu_2_rfu: body attitude RFU in NED frame
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for both input and output attitudes
 Return:
   body attitude FRD in NED frame
 '''
@@ -75,7 +75,7 @@ The function is through the way by calculation of euler by delta x/y/z
 Args:
   delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
   roll_y: self rotation of the heading vector
-  is_degree: result returned is degree if True, radian if False
+  is_degree: True is degree and False is radian for output attitude
 Return:
   body attitude RFU in ENU frame
 '''
@@ -108,7 +108,7 @@ The function is through the way by calculation of vertical rotvec by delta x/y/z
 Args:
   delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
   roll_y: self rotation of the heading vector
-  is_degree: result returned is degree if True, radian if False
+  is_degree: True is degree and False is radian for output attitude
 Return:
   body attitude RFU in ENU frame
 '''
@@ -131,9 +131,10 @@ Get delta between two attitudes.
 Args:
   att1, att2: two attitudes
   rot_seq: euler angles rotation sequence
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for input attitudes and output delta euler
 Return:
-  delta between two attitudes
+  [0]: delt rotation between two attitudes
+  [1]: delta euler between two attitudes
 '''
 def delta_att(att1, att2, rot_seq, is_degree):
   angle_unit = util.get_angle_unit(is_degree)
@@ -146,9 +147,32 @@ def delta_att(att1, att2, rot_seq, is_degree):
 
   delta_rot = rot1.inv() * rot2
 
-  delta_att = delta_rot.as_euler(rot_seq, is_degree)
-  logger.info('delta attitude by %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_att))
+  delta_euler = delta_rot.as_euler(rot_seq, is_degree)
+  logger.info('delta euler by %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_euler))
 
-  #[ToDo] delta_att = new_frame.euler_in_new_frame(delta_att, att2, rot_seq, is_degree)
+  return delta_rot, delta_euler
 
-  return delta_att
+'''
+Get angular rate from two attitudes and time.
+
+Args:
+  delta_time: time cost from att1 to att2
+  att1, att2: two attitudes
+  rot_seq: euler angles rotation sequence
+  is_degree: True is degree and False is radian for input attitudes and output augular rate
+Return:
+  angular rate from att1 to att2 within time
+'''
+def angular_rate(delta_time, att1, att2, rot_seq, is_degree):
+  delta_rot = delta_att(att1, att2, rot_seq, is_degree)[0]
+
+  delta_rotvec = delta_rot.as_rotvec()
+  logger.info('delta rotvec: %s' % delta_rotvec)
+
+  angular_rate = delta_rotvec / delta_time
+  logger.info('angular rate(rad): %s' % angular_rate)
+  if (is_degree):
+    angular_rate = np.rad2deg(angular_rate)
+    logger.info('angular rate(deg): %s' % angular_rate)
+
+  return angular_rate

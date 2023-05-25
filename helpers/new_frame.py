@@ -31,7 +31,7 @@ Args:
   euler_old_frame: body euler angles in old frame
   euler_frame_old_2_new: frame euler angles from old frame to new
   rot_seq: euler angles rotation sequence
-  is_degree: True is degree, False is radian
+  is_degree: True is degree and False is radian for both input and output eulers
 Return:
   body euler angles in new frame
 '''
