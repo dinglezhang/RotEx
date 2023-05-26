@@ -21,7 +21,7 @@ logger = util.get_logger()
 
 '''
   NED_2_ENU and ENU_2_NED are actually the same rotation.
-  So define NED_X_ENU which means to exchange each other, which rotation sequence is 'ZYX'
+  So define NED_X_ENU which means to exchange each other, whose rotation sequence is 'ZYX'
 '''
 EULER_D_FRAME_NED_X_ENU_ZYX = np.array([-90, 180, 0])
 EULER_R_FRAME_NED_X_ENU_ZYX = np.deg2rad(EULER_D_FRAME_NED_X_ENU_ZYX)

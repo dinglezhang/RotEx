@@ -79,11 +79,38 @@ def test_one_delta_att(att_d_1, att_d_2, rot_seq):
   print('expected: %s' % att_d_2)
   print('rotated: %s\n' % att_d_2_calc)
 
+def test_linear_delta_att(att_d_1, factor, rot_seq):
+  print('============================test linear delta attitude============================')
+
+  # calculate att_d_2 from att_d_1 and factor (linear change on rotvec)
+  rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
+  rotvec1 = rot1.as_rotvec()
+  rotvec2 = rotvec1 * factor
+  rot2 = Rotation.from_rotvec(rotvec2)
+  att_d_2 = rot2.as_euler(rot_seq, True)
+
+  # calculate delta_att by att.delta_att()
+  (delta_rot, delta_euler_d) = att.delta_att(att_d_1, att_d_2, rot_seq, True)
+
+  # calcaulate delta_att_linear by a special way for linear rotvec change
+  delta_rotvec_linear = rotvec2 - rotvec1
+  delta_rot_linear = Rotation.from_rotvec(delta_rotvec_linear)
+  delta_euler_d_linear = delta_rot_linear.as_euler(rot_seq, True)
+
+  result = test_util.get_result(np.allclose(delta_euler_d, delta_euler_d_linear))
+  print('***delat att(deg) by %s sequence: %s***' % (rot_seq, result))
+  print('att.delta_att(): %s' % delta_euler_d)
+  print('linear_delta_att: %s\n' % delta_euler_d_linear)
+
 def test_delta_att():
   att_d_1 = np.array([10, 1, 4])
   att_d_2 = np.array([11, 2, 5])
+
   test_one_delta_att(att_d_1, att_d_2, 'ZYX')
   test_one_delta_att(att_d_1, att_d_2, 'zyx')
+
+  test_linear_delta_att(att_d_1, 1.1, 'ZYX')
+  test_linear_delta_att(att_d_1, 1.2, 'zyx')
 
 def test_one_angular_rate(delta_time, att_d_1, att_d_2, rot_seq):
   print('============================test one angular rate============================')
