@@ -3,6 +3,16 @@ import numpy as np
 from helpers import rotate_vectors as rv
 from . import test_util
 
+def test_one_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
+  print('============================test rotate vectors once by rot============================')
+
+  vectors_rotated = rv.rotate_vectors(vectors, rot, 1, on_frame)
+
+  result = test_util.get_result(np.allclose(vectors_rotated, vectors_rotated_expected))
+  print('***vetors rotated: %s***' % result)
+  print('expected:\n%s' % vectors_rotated_expected)
+  print('rotated:\n%s\n' % vectors_rotated)
+
 def test_one_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
   print('============================test rotate vectors once============================')
 

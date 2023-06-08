@@ -68,30 +68,34 @@ def att_enu_2_ned(att_enu_2_rfu, is_degree):
   return att_ned_2_frd
 
 '''
-Get attitude by delta x/y/z and roll on y in ENU frame.
+Get attitude by delta x/y/z and cross slope angle in ENU frame.
 Say a vector like body heading vector, it rotates from north direction to its front direction
-The function is through the way by calculation of euler by delta x/y/z
+The function is through the way of euler
 
 Args:
   delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
-  roll_y: self rotation of the heading vector
-  is_degree: True is degree and False is radian for output attitude
+  cross_slope_angle: the angle at which a surface slopes across
+  is_degree: True is degree and False is radian for input cross_slope_angle and output attitude
 Return:
+  rotation from ENU to RFU
   body attitude RFU in ENU frame
 '''
-def att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, roll_y, is_degree):
+def att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
   yaw_z = math.atan2(-delta_x, delta_y)
   pitch_x = math.atan2(delta_z, math.sqrt(delta_x * delta_x + delta_y * delta_y))
 
+  if (is_degree):
+    cross_slope_angle = np.deg2rad(cross_slope_angle)
+  roll_y = -math.asin(math.sin(cross_slope_angle) / math.cos(pitch_x))
+
   att_r_ZXY = np.array([yaw_z, pitch_x, roll_y])
-  logger.info('attitude by ZXY sequence: euler(rad)%s' % att_r_ZXY)
+  logger.info('attitude in ZXY sequence: euler(deg)%s' % np.rad2deg(att_r_ZXY))
 
-  rot = Rotation.from_euler("ZXY", att_r_ZXY, False)
-
+  rot = Rotation.from_euler('ZXY', att_r_ZXY, False)
   att_ZYX = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude by ZYX sequence: euler(%s)%s' % (util.get_angle_unit(is_degree), att_ZYX))
+  logger.info('attitude in ZYX sequence: euler(%s)%s\n' % (util.get_angle_unit(is_degree), att_ZYX))
 
-  return att_ZYX
+  return rot, att_ZYX
 
 def get_vertical_rotvec(v1, v2):
   rot_vec = np.cross(v1, v2)
@@ -100,30 +104,36 @@ def get_vertical_rotvec(v1, v2):
   return rot_vec
 
 '''
-Get attitude by delta x/y/z and roll on y in ENU frame.
+Get attitude by delta x/y/z and cross slope angle in ENU frame.
 Say a vector like body heading vector, it rotates from north direction to its front direction
-The function is through the way by calculation of vertical rotvec by delta x/y/z
-[ToDo] how to use roll_y
+The function is through the way of vertical rotvec
 
 Args:
   delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
-  roll_y: self rotation of the heading vector
-  is_degree: True is degree and False is radian for output attitude
+  cross_slope_angle: the angle at which a surface slopes across
+  is_degree: True is degree and False is radian for input cross_slope_angle and output attitude
 Return:
+  rotation from ENU to RFU
   body attitude RFU in ENU frame
 '''
-def att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, roll_y, is_degree):
+def att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
   heading_start = np.array([0, 1, 0])
   heading_end = np.array([delta_x, delta_y, delta_z])
   heading_end = heading_end / np.linalg.norm(heading_end)
 
   vertical_rotvec = get_vertical_rotvec(heading_start, heading_end)
-
   rot = Rotation.from_rotvec(vertical_rotvec)
-  att = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude by ZYX sequence: euler(%s)%s' % (util.get_angle_unit(is_degree), att))
 
-  return att
+  if (is_degree):
+    cross_slope_angle = np.deg2rad(cross_slope_angle)
+  #[ToDo] correct the following
+  #rot_cross_slope_angle = Rotation.from_rotvec(np.array([0, 1, 0]) * cross_slope_angle)
+  #rot = rot * rot_cross_slope_angle
+
+  att = rot.as_euler('ZYX', is_degree)
+  logger.info('attitude in ZYX sequence: euler(%s)%s' % (util.get_angle_unit(is_degree), att))
+
+  return rot, att
 
 '''
 Get delta between two attitudes.
@@ -138,7 +148,7 @@ Return:
 '''
 def delta_att(att1, att2, rot_seq, is_degree):
   angle_unit = util.get_angle_unit(is_degree)
-  logger.info('two attitudes input by %s sequence:' % rot_seq)
+  logger.info('two attitudes input in %s sequence:' % rot_seq)
   logger.info('euler1(%s)%s' % (angle_unit, att1))
   logger.info('euler2(%s)%s' % (angle_unit, att2))
 
@@ -148,7 +158,7 @@ def delta_att(att1, att2, rot_seq, is_degree):
   delta_rot = rot1.inv() * rot2
 
   delta_euler = delta_rot.as_euler(rot_seq, is_degree)
-  logger.info('delta euler by %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_euler))
+  logger.info('delta euler in %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_euler))
 
   return delta_rot, delta_euler
 

@@ -6,21 +6,15 @@ from helpers import util
 from . import test_util
 
 '''
-Print all kinds of expression of a rotation by euler angles.
+Print all kinds of expression of a rotation by rotation.
 
 Args:
-  euler: euler angles to rotate
-  rot_seq: euler angles rotation sequence
-  is_degree: True is degree and False is radian for both input and output eulers
+  rot: rotation
+  is_degree: True is degree and False is radian for output eulers
 Return:
   None
 '''
-def euler_2_x(euler, rot_seq, is_degree):
-  angle_unit = util.get_angle_unit(is_degree)
-  print('euler(%s) input by %s sequence: %s\n' % (angle_unit, rot_seq, euler))
-
-  rot = Rotation.from_euler(rot_seq, euler, is_degree)
-
+def rot_2_x(rot, is_degree):
   dcm = rot.as_matrix()
   print('***dcm***\n%s\n' % dcm)
 
@@ -37,13 +31,37 @@ def euler_2_x(euler, rot_seq, is_degree):
   result = test_util.get_result(np.allclose(cross_rotvec_mrp, [0, 0, 0]) and    # the two are parallel
                                 np.allclose(math.tan(norm_rotvec/4), norm_mrp)) # angle relation
   print('***rotvec and mrp output: %s***' % result)
+
+  if (is_degree):
+    norm_rotvec = np.rad2deg(norm_rotvec)
   print('rotvec: %s angle:        %s' % (rotvec, norm_rotvec))
+
+  if (is_degree):
+    norm_mrp = np.rad2deg(norm_mrp)
   print('mrp:    %s tan(angle/4): %s\n' % (mrp, norm_mrp))
 
-  print('***euler by all rotation sequences***')
+  print('***euler in all rotation sequences***')
   for rot_seq in (util.ROTATION_SEQUENCES_INTRINSIC + util.ROTATION_SEQUENCES_EXTRINSIC):
     euler_seq = rot.as_euler(rot_seq, is_degree)
     print('%s: %s' % (rot_seq, euler_seq))
+
+'''
+Print all kinds of expression of a rotation by euler angles.
+
+Args:
+  euler: euler angles to rotate
+  rot_seq: euler angles rotation sequence
+  is_degree: True is degree and False is radian for both input and output eulers
+Return:
+  None
+'''
+def euler_2_x(euler, rot_seq, is_degree):
+  angle_unit = util.get_angle_unit(is_degree)
+  print('euler(%s) input in %s sequence: %s\n' % (angle_unit, rot_seq, euler))
+
+  rot = Rotation.from_euler(rot_seq, euler, is_degree)
+
+  rot_2_x(rot, is_degree)
 
 '''
 Rotate by euler angles once or 3 times one by one, and test if they get the same results
@@ -57,7 +75,7 @@ Return:
 '''
 def euler_one_by_one(euler, rot_seq, is_degree):
   angle_unit = util.get_angle_unit(is_degree)
-  print('euler(%s) input by %s sequence: %s\n' % (angle_unit, rot_seq, euler))
+  print('euler(%s) input in %s sequence: %s\n' % (angle_unit, rot_seq, euler))
 
   rot_once = Rotation.from_euler(rot_seq, euler, is_degree)
   euler_once = rot_once.as_euler(rot_seq, is_degree)

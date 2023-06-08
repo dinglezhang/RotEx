@@ -51,7 +51,7 @@ Return:
 '''
 def rotate_vectors_by_euler(vectors, euler, rot_seq, is_degree, times = 1, on_frame = False):
   angle_unit = util.get_angle_unit(is_degree)
-  logger.info('euler(%s) input by %s sequence: %s' % (angle_unit, rot_seq, euler))
+  logger.info('euler(%s) input in %s sequence: %s' % (angle_unit, rot_seq, euler))
 
   rot_once = Rotation.from_euler(rot_seq, euler, is_degree)
   vectors_rotated = rotate_vectors(vectors, rot_once, times, on_frame)

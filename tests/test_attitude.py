@@ -1,8 +1,11 @@
+import math
 import numpy as np
 from scipy.spatial.transform import Rotation, RotationSpline
 
 from helpers import attitude as att
+
 from . import test_util
+from . import test_rotate_vectors
 
 def test_one_att_ned_2_enu(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
   print('============================test one attitude NED to ENU============================')
@@ -34,36 +37,42 @@ def test_att_ned_x_enu():
   test_one_att_enu_2_ned(np.array([0, 45, 90]), np.array([90, 45, 90]))
 
 def test_att_enu_2_rfu_by_delta_xyz():
-  print('============================test attitude from enu to rfu by delta xyz and roll============================')
+  print('============================test attitude from enu to rfu by delta xyz and cross slope angle============================')
 
   delta_x = -1
-  delta_y = 1
-  delta_z = 0.01#math.sqrt(delta_x * delta_x + delta_y * delta_y)
-  roll_y = 0.1
-  print('delta_x: %s delta_y: %s delta_z: %s roll_y: %s\n' % (delta_x, delta_y, delta_z, roll_y))
+  delta_y = 2
+  delta_z = 0.5#math.sqrt(delta_x * delta_x + delta_y * delta_y)
+  cross_slope_angle = 15
+  print('delta_x: %s delta_y: %s delta_z: %s cross_slope_angle: %s\n' % (delta_x, delta_y, delta_z, cross_slope_angle))
 
-  # test by heading vector
-  heading_north = np.array([0, 1, 0])
-  heading_expected = np.array([delta_x, delta_y, delta_z])
-  heading_expected = heading_expected / np.linalg.norm(heading_expected)
+  (rot, att_d_through_euler) = att.att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, cross_slope_angle, True)
 
-  att_d_through_euler = att.att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, roll_y, True)
-  rot_through_euler = Rotation.from_euler("ZYX", att_d_through_euler, True)
-  heading_rotated_through_euler = rot_through_euler.apply(heading_north)
-  result = test_util.get_result(np.allclose(heading_expected, heading_rotated_through_euler))
-  print('***heading through euler: %s***' % result)
-  print('expected: %s' % heading_expected)
-  print('rotated: %s\n' % heading_rotated_through_euler)
+  # test by heading frond
+  heading_front_start = np.array([0, 1, 0])
+  heading_front_end_expected = np.array([delta_x, delta_y, delta_z])
+  heading_front_end_expected = heading_front_end_expected / np.linalg.norm(heading_front_end_expected)
+  test_rotate_vectors.test_one_rotate_vectors_once(heading_front_start, att_d_through_euler, 'ZYX', heading_front_end_expected, False)
 
-  att_d_through_rotvec = att.att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, roll_y, True)
-  rot_through_rotvec = Rotation.from_euler("ZYX", att_d_through_rotvec, True)
-  heading_rotated_through_rotvec = rot_through_rotvec.apply(heading_north)
-  result = test_util.get_result(np.allclose(heading_expected, heading_rotated_through_rotvec))
-  print('***heading through vertical rotvec: %s***' % result)
-  print('expected: %s' % heading_expected)
-  print('rotated: %s\n' % heading_rotated_through_rotvec)
+  # test cross slope angle by heading right
+  heading_right_start = np.array([1, 0, 0])
+  heading_right_end = rot.apply(heading_right_start)
+  cross_slope_angle_calc = math.atan2(heading_right_end[2], math.sqrt(heading_right_end[0] ** 2 + heading_right_end[1] ** 2))
+  cross_slope_angle_calc = np.rad2deg(cross_slope_angle_calc)
 
-  #[ToDo] add more test on vectors other than heading_north
+  result = test_util.get_result(np.allclose(cross_slope_angle, cross_slope_angle_calc))
+  print('***cross slope angle(deg): %s***' % result)
+  print('input: %s' % cross_slope_angle)
+  print('calculated: %s\n' % cross_slope_angle_calc)
+
+  (rot, att_d_through_rotvec) = att.att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, cross_slope_angle, True)
+  test_rotate_vectors.test_one_rotate_vectors_once(heading_front_start, att_d_through_rotvec, 'ZYX', heading_front_end_expected, False)
+
+'''
+  result = test_util.get_result(np.allclose(att_d_through_euler, att_d_through_rotvec))
+  print('***attitude(deg) by RFU: %s***' % result)
+  print('through euler: %s' % att_d_through_euler)
+  print('through rotvec: %s\n' % att_d_through_rotvec)
+'''
 
 def test_one_delta_att(att_d_1, att_d_2, rot_seq):
   print('============================test one delta attitude============================')
@@ -75,7 +84,7 @@ def test_one_delta_att(att_d_1, att_d_2, rot_seq):
 
   att_d_2_calc = rot2_calc.as_euler(rot_seq, True)
   result = test_util.get_result(np.allclose(att_d_2_calc, att_d_2))
-  print('***att2(deg) by %s sequence after rotation by delta euler: %s***' % (rot_seq, result))
+  print('***att2(deg) in %s sequence after rotation by delta euler: %s***' % (rot_seq, result))
   print('expected: %s' % att_d_2)
   print('rotated: %s\n' % att_d_2_calc)
 
@@ -98,7 +107,7 @@ def test_linear_delta_att(att_d_1, factor, rot_seq):
   delta_euler_d_linear = delta_rot_linear.as_euler(rot_seq, True)
 
   result = test_util.get_result(np.allclose(delta_euler_d, delta_euler_d_linear))
-  print('***delat att(deg) by %s sequence: %s***' % (rot_seq, result))
+  print('***delat att(deg) in %s sequence: %s***' % (rot_seq, result))
   print('att.delta_att(): %s' % delta_euler_d)
   print('linear_delta_att: %s\n' % delta_euler_d_linear)
 
