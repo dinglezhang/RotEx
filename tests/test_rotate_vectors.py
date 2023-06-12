@@ -3,8 +3,8 @@ import numpy as np
 from helpers import rotate_vectors
 from . import test_util
 
-def test_one_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
-  print('============================test rotate vectors once by rot============================')
+def test_single_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
+  print('============================test single rotate vectors once by rot============================')
 
   vectors_rotated = rotate_vectors.rotate_vectors(vectors, rot, 1, on_frame)
 
@@ -13,8 +13,8 @@ def test_one_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, 
   print('expected:\n%s' % vectors_rotated_expected)
   print('rotated:\n%s\n' % vectors_rotated)
 
-def test_one_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
-  print('============================test rotate vectors once============================')
+def test_single_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
+  print('============================test single rotate vectors once============================')
 
   vectors_rotated = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, 1, on_frame)
 
@@ -38,7 +38,7 @@ def test_rotate_vectors_once():
     [1, 0, 0],
     [1, 1, 1]
   ])
-  test_one_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, False)
+  test_single_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, False)
 
   vectors_rotated_expected = np.array([
     [0, 0, 1],
@@ -46,7 +46,7 @@ def test_rotate_vectors_once():
     [0, 1, 0],
     [1, 1, 1]
   ])
-  test_one_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, True)
+  test_single_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, True)
 
   vectors_rotated_expected = np.array([
     [0, 0, -1],
@@ -54,7 +54,7 @@ def test_rotate_vectors_once():
     [1, 0, 0],
     [1, 1, -1]
   ])
-  test_one_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, False)
+  test_single_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, False)
 
   vectors_rotated_expected = np.array([
     [0, 0, 1],
@@ -62,10 +62,10 @@ def test_rotate_vectors_once():
     [-1, 0, 0],
     [-1, 1, 1]
   ])
-  test_one_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, True)
+  test_single_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, True)
 
-def test_one_rotate_vectors_multple_times(vectors, euler_d, rot_seq, times, on_frame):
-  print('============================test rotate vectors %s times============================' % times)
+def test_single_rotate_vectors_multple_times(vectors, euler_d, rot_seq, times, on_frame):
+  print('============================test single rotate vectors %s times============================' % times)
 
   vectors_rotated_one_by_one = vectors
   for i in range(1, times + 1):
@@ -97,10 +97,10 @@ def test_rotate_vectors_multple_times():
   ])
   euler_d = np.array([3, 3, 3])
 
-  test_one_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, False)
-  test_one_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, True)
-  test_one_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, False)
-  test_one_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, True)
+  test_single_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, False)
+  test_single_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, True)
+  test_single_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, False)
+  test_single_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, True)
 
 def test():
   test_rotate_vectors_once()

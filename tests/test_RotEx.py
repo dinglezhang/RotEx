@@ -13,7 +13,7 @@ def test_single_from_two_vectors(v1, v2, self_roll_angle):
 
   print('test on v1 and v2')
   v2_expected = v2 / np.linalg.norm(v2) * np.linalg.norm(v1)
-  test_rotate_vectors.test_one_rotate_vectors_once_by_rot(v1, rot, v2_expected, False)
+  test_rotate_vectors.test_single_rotate_vectors_once_by_rot(v1, rot, v2_expected, False)
 
   # test on a vector vertical with v1 and v2, which can reflect change on self_roll_angle
   print('test on vertical v1 and v2')
@@ -21,7 +21,7 @@ def test_single_from_two_vectors(v1, v2, self_roll_angle):
   self_roll_angle = np.deg2rad(self_roll_angle)
   rot_on_v2 = Rotation.from_rotvec(v2 / np.linalg.norm(v2) * self_roll_angle)
   vertical_v2 = rot_on_v2.apply(vertical_v1)
-  test_rotate_vectors.test_one_rotate_vectors_once_by_rot(vertical_v1, rot, vertical_v2, False)
+  test_rotate_vectors.test_single_rotate_vectors_once_by_rot(vertical_v1, rot, vertical_v2, False)
 
 def test_from_two_vectors():
   v1 = np.array([0, 3, 0])
