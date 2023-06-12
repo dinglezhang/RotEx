@@ -56,8 +56,7 @@ Return:
   None
 '''
 def euler_2_x(euler, rot_seq, is_degree):
-  angle_unit = util.get_angle_unit(is_degree)
-  print('euler(%s) input in %s sequence: %s\n' % (angle_unit, rot_seq, euler))
+  print('euler(%s) input in %s sequence: %s\n' % (util.get_angular_unit(is_degree), rot_seq, euler))
 
   rot = Rotation.from_euler(rot_seq, euler, is_degree)
 
@@ -74,8 +73,8 @@ Return:
   None
 '''
 def euler_one_by_one(euler, rot_seq, is_degree):
-  angle_unit = util.get_angle_unit(is_degree)
-  print('euler(%s) input in %s sequence: %s\n' % (angle_unit, rot_seq, euler))
+  angular_unit = util.get_angular_unit(is_degree)
+  print('euler(%s) input in %s sequence: %s\n' % (angular_unit, rot_seq, euler))
 
   rot_once = Rotation.from_euler(rot_seq, euler, is_degree)
   euler_once = rot_once.as_euler(rot_seq, is_degree)
@@ -87,7 +86,7 @@ def euler_one_by_one(euler, rot_seq, is_degree):
   euler_one_by_one = rot_one_by_one.as_euler(rot_seq, is_degree)
 
   result = test_util.get_result(np.allclose(euler_once, euler_one_by_one))
-  print('***euler(%s) between once and one by one: %s***' % (angle_unit, result))
+  print('***euler(%s) between once and one by one: %s***' % (angular_unit, result))
   print('once: %s' % euler_once)
   print('one by one: %s\n' % euler_one_by_one)
 

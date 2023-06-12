@@ -21,9 +21,9 @@ logger.addHandler(handler)
 def get_logger():
   return logger
 
-def get_angle_unit(is_degree):
-  unit = 'deg'
-  if not is_degree:
-    unit = 'rad'
+def get_angular_unit(is_degree):
+  unit = 'rad'
+  if is_degree:
+    unit = 'deg'
 
   return unit

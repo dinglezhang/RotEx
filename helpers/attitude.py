@@ -45,9 +45,9 @@ Return:
   body attitude RFU in ENU frame
 '''
 def att_ned_2_enu(att_ned_2_frd, is_degree):
-  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_ned_2_frd))
+  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_ned_2_frd))
   att_enu_2_rfu = att_ned_x_enu(att_ned_2_frd, is_degree)
-  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_enu_2_rfu))
+  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_enu_2_rfu))
 
   return att_enu_2_rfu
 
@@ -61,9 +61,9 @@ Return:
   body attitude FRD in NED frame
 '''
 def att_enu_2_ned(att_enu_2_rfu, is_degree):
-  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_enu_2_rfu))
+  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_enu_2_rfu))
   att_ned_2_frd = att_ned_x_enu(att_enu_2_rfu, is_degree)
-  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angle_unit(is_degree), att_ned_2_frd))
+  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_ned_2_frd))
 
   return att_ned_2_frd
 
@@ -92,7 +92,7 @@ def att_enu_2_rfu(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
 
   rot = Rotation.from_euler('ZXY', att_r_ZXY, False)
   att_ZYX = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude in ZYX sequence: euler(%s)%s\n' % (util.get_angle_unit(is_degree), att_ZYX))
+  logger.info('attitude in ZYX sequence: euler(%s)%s\n' % (util.get_angular_unit(is_degree), att_ZYX))
 
   return rot, att_ZYX
 
@@ -108,10 +108,10 @@ Return:
   [1]: delta euler between two attitudes
 '''
 def delta_att(att1, att2, rot_seq, is_degree):
-  angle_unit = util.get_angle_unit(is_degree)
+  angular_unit = util.get_angular_unit(is_degree)
   logger.info('two attitudes input in %s sequence:' % rot_seq)
-  logger.info('euler1(%s)%s' % (angle_unit, att1))
-  logger.info('euler2(%s)%s' % (angle_unit, att2))
+  logger.info('euler1(%s)%s' % (angular_unit, att1))
+  logger.info('euler2(%s)%s' % (angular_unit, att2))
 
   rot1 = Rotation.from_euler(rot_seq, att1, is_degree)
   rot2 = Rotation.from_euler(rot_seq, att2, is_degree)
@@ -119,7 +119,7 @@ def delta_att(att1, att2, rot_seq, is_degree):
   delta_rot = rot1.inv() * rot2
 
   delta_euler = delta_rot.as_euler(rot_seq, is_degree)
-  logger.info('delta euler in %s sequence: euler(%s)%s' % (rot_seq, angle_unit, delta_euler))
+  logger.info('delta euler in %s sequence: euler(%s)%s' % (rot_seq, angular_unit, delta_euler))
 
   return delta_rot, delta_euler
 
