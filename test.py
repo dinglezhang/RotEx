@@ -3,6 +3,7 @@ import numpy as np
 from helpers import util
 
 from tests import test_util
+from tests import test_RotEx
 from tests import test_euler
 from tests import test_attitude
 from tests import test_rotate_vectors
@@ -16,9 +17,11 @@ logger = util.get_logger()
 if __name__ == '__main__':
   np.set_printoptions(precision = 8, suppress = True)
 
+  test_RotEx.test()
   test_euler.test()
   test_attitude.test()
   test_rotate_vectors.test()
+
   #test_spline.test()
   #test_slerp.test()
 

@@ -32,11 +32,11 @@ def rot_2_x(rot, is_degree):
                                 np.allclose(math.tan(norm_rotvec/4), norm_mrp)) # angle relation
   print('***rotvec and mrp output: %s***' % result)
 
-  if (is_degree):
+  if is_degree:
     norm_rotvec = np.rad2deg(norm_rotvec)
   print('rotvec: %s angle:        %s' % (rotvec, norm_rotvec))
 
-  if (is_degree):
+  if is_degree:
     norm_mrp = np.rad2deg(norm_mrp)
   print('mrp:    %s tan(angle/4): %s\n' % (mrp, norm_mrp))
 

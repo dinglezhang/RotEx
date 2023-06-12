@@ -70,21 +70,20 @@ def att_enu_2_ned(att_enu_2_rfu, is_degree):
 '''
 Get attitude by delta x/y/z and cross slope angle in ENU frame.
 Say a vector like body heading vector, it rotates from north direction to its front direction
-The function is through the way of euler
 
 Args:
   delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
   cross_slope_angle: the angle at which a surface slopes across
   is_degree: True is degree and False is radian for input cross_slope_angle and output attitude
 Return:
-  rotation from ENU to RFU
-  body attitude RFU in ENU frame
+  [0]: rotation from ENU to RFU
+  [1]: body attitude RFU in ENU frame
 '''
-def att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
+def att_enu_2_rfu(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
   yaw_z = math.atan2(-delta_x, delta_y)
   pitch_x = math.atan2(delta_z, math.sqrt(delta_x * delta_x + delta_y * delta_y))
 
-  if (is_degree):
+  if is_degree:
     cross_slope_angle = np.deg2rad(cross_slope_angle)
   roll_y = -math.asin(math.sin(cross_slope_angle) / math.cos(pitch_x))
 
@@ -96,44 +95,6 @@ def att_enu_2_rfu_through_euler(delta_x, delta_y, delta_z, cross_slope_angle, is
   logger.info('attitude in ZYX sequence: euler(%s)%s\n' % (util.get_angle_unit(is_degree), att_ZYX))
 
   return rot, att_ZYX
-
-def get_vertical_rotvec(v1, v2):
-  rot_vec = np.cross(v1, v2)
-  rot_angle = np.arccos(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
-  rot_vec = rot_vec / np.linalg.norm(rot_vec) * rot_angle
-  return rot_vec
-
-'''
-Get attitude by delta x/y/z and cross slope angle in ENU frame.
-Say a vector like body heading vector, it rotates from north direction to its front direction
-The function is through the way of vertical rotvec
-
-Args:
-  delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
-  cross_slope_angle: the angle at which a surface slopes across
-  is_degree: True is degree and False is radian for input cross_slope_angle and output attitude
-Return:
-  rotation from ENU to RFU
-  body attitude RFU in ENU frame
-'''
-def att_enu_2_rfu_through_rotvec(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
-  heading_start = np.array([0, 1, 0])
-  heading_end = np.array([delta_x, delta_y, delta_z])
-  heading_end = heading_end / np.linalg.norm(heading_end)
-
-  vertical_rotvec = get_vertical_rotvec(heading_start, heading_end)
-  rot = Rotation.from_rotvec(vertical_rotvec)
-
-  if (is_degree):
-    cross_slope_angle = np.deg2rad(cross_slope_angle)
-  #[ToDo] correct the following
-  #rot_cross_slope_angle = Rotation.from_rotvec(np.array([0, 1, 0]) * cross_slope_angle)
-  #rot = rot * rot_cross_slope_angle
-
-  att = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude in ZYX sequence: euler(%s)%s' % (util.get_angle_unit(is_degree), att))
-
-  return rot, att
 
 '''
 Get delta between two attitudes.
@@ -181,7 +142,7 @@ def angular_rate(delta_time, att1, att2, rot_seq, is_degree):
 
   angular_rate = delta_rotvec / delta_time
   logger.info('angular rate(rad): %s' % angular_rate)
-  if (is_degree):
+  if is_degree:
     angular_rate = np.rad2deg(angular_rate)
     logger.info('angular rate(deg): %s' % angular_rate)
 
