@@ -3,6 +3,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from . import util
+from . import RotEx
 from . import new_frame
 
 logger = util.get_logger()
@@ -27,9 +28,9 @@ EULER_D_FRAME_NED_X_ENU_ZYX = np.array([-90, 180, 0])
 EULER_R_FRAME_NED_X_ENU_ZYX = np.deg2rad(EULER_D_FRAME_NED_X_ENU_ZYX)
 
 def att_ned_x_enu(att_old_frame, is_degree):
-  euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU_ZYX
-  if not is_degree:
-    euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU_ZYX
+  euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU_ZYX
+  if is_degree:
+    euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU_ZYX
 
   att_new_frame = new_frame.euler_in_new_frame(att_old_frame, euler_frame_ned_x_enu, 'ZYX', is_degree)
 
@@ -68,29 +69,20 @@ def att_enu_2_ned(att_enu_2_rfu, is_degree):
   return att_ned_2_frd
 
 '''
-Get attitude by delta x/y/z and cross slope angle in ENU frame.
-Say a vector like body heading vector, it rotates from north direction to its front direction
+Get attitude from ENU frame to body RFU frame, with right slope angle.
+Say a vector like body heading vector, it rotates from north direction to its front direction.
 
 Args:
-  delta_x, delta_y, delta_z: tangent direction, which is end direction of body heading vector
-  cross_slope_angle: the angle at which a surface slopes across
-  is_degree: True is degree and False is radian for input cross_slope_angle and output attitude
+  heading: body heading vector in body RFU frame
+  right_slope_angle: the slope angle of body right direction
+  is_degree: True is degree and False is radian for input right_slope_angle and output attitude
 Return:
-  [0]: rotation from ENU to RFU
-  [1]: body attitude RFU in ENU frame
+  [0]: rotation from ENU frame to body RFU frame
+  [1]: body attitude from ENU frame to body RFU frame
 '''
-def att_enu_2_rfu(delta_x, delta_y, delta_z, cross_slope_angle, is_degree):
-  yaw_z = math.atan2(-delta_x, delta_y)
-  pitch_x = math.atan2(delta_z, math.sqrt(delta_x * delta_x + delta_y * delta_y))
+def att_enu_2_rfu(heading, right_slope_angle, is_degree):
+  rot = RotEx.from_axisY_2_vector(heading, right_slope_angle, is_degree)
 
-  if is_degree:
-    cross_slope_angle = np.deg2rad(cross_slope_angle)
-  roll_y = -math.asin(math.sin(cross_slope_angle) / math.cos(pitch_x))
-
-  att_r_ZXY = np.array([yaw_z, pitch_x, roll_y])
-  logger.info('attitude in ZXY sequence: euler(deg)%s' % np.rad2deg(att_r_ZXY))
-
-  rot = Rotation.from_euler('ZXY', att_r_ZXY, False)
   att_ZYX = rot.as_euler('ZYX', is_degree)
   logger.info('attitude in ZYX sequence: euler(%s)%s\n' % (util.get_angular_unit(is_degree), att_ZYX))
 

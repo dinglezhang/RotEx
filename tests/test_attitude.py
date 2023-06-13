@@ -36,33 +36,40 @@ def test_att_ned_x_enu():
   test_single_att_enu_2_ned(np.array([0, 45, 0]), np.array([0, 0, 45]))
   test_single_att_enu_2_ned(np.array([0, 45, 90]), np.array([90, 45, 90]))
 
-def test_att_enu_2_rfu_by_delta_xyz():
-  print('============================test attitude from enu to rfu by delta xyz and cross slope angle============================')
+def test_single_att_enu_2_rfu(heading, right_slope_angle):
+  print('============================test single attitude from enu to rfu============================')
 
-  delta_x = -1
-  delta_y = 2
-  delta_z = 0.5#math.sqrt(delta_x * delta_x + delta_y * delta_y)
-  cross_slope_angle = 15
-  print('delta_x: %s delta_y: %s delta_z: %s cross_slope_angle: %s\n' % (delta_x, delta_y, delta_z, cross_slope_angle))
+  print('heading: %s right_slope_angle: %s\n' % (heading, right_slope_angle))
+  (rot, att_d_through_euler) = attitude.att_enu_2_rfu(heading, right_slope_angle, True)
 
-  (rot, att_d_through_euler) = attitude.att_enu_2_rfu(delta_x, delta_y, delta_z, cross_slope_angle, True)
+  # test on heading vector by heading
+  heading_start = np.array([0, 1, 0])
+  heading_end_expected = heading / np.linalg.norm(heading)
+  test_rotate_vectors.test_single_rotate_vectors_once(heading_start, att_d_through_euler, 'ZYX', heading_end_expected, False)
 
-  # test by heading frond
-  heading_front_start = np.array([0, 1, 0])
-  heading_front_end_expected = np.array([delta_x, delta_y, delta_z])
-  heading_front_end_expected = heading_front_end_expected / np.linalg.norm(heading_front_end_expected)
-  test_rotate_vectors.test_single_rotate_vectors_once(heading_front_start, att_d_through_euler, 'ZYX', heading_front_end_expected, False)
+  # test on right slope angle by right direction
+  right_start = np.array([1, 0, 0])
+  right_end = rot.apply(right_start)
+  right_slope_angle_result = math.atan2(right_end[2], math.sqrt(right_end[0] ** 2 + right_end[1] ** 2))
+  right_slope_angle_result = np.rad2deg(right_slope_angle_result)
 
-  # test cross slope angle by heading right
-  heading_right_start = np.array([1, 0, 0])
-  heading_right_end = rot.apply(heading_right_start)
-  cross_slope_angle_calc = math.atan2(heading_right_end[2], math.sqrt(heading_right_end[0] ** 2 + heading_right_end[1] ** 2))
-  cross_slope_angle_calc = np.rad2deg(cross_slope_angle_calc)
+  result = test_util.get_result(np.allclose(right_slope_angle, right_slope_angle_result))
+  print('***right slope angle(deg): %s***' % result)
+  print('input: %s' % right_slope_angle)
+  print('result: %s\n' % right_slope_angle_result)
 
-  result = test_util.get_result(np.allclose(cross_slope_angle, cross_slope_angle_calc))
-  print('***cross slope angle(deg): %s***' % result)
-  print('input: %s' % cross_slope_angle)
-  print('calculated: %s\n' % cross_slope_angle_calc)
+def test_att_enu_2_rfu():
+  heading = np.array([-1, 1, math.sqrt(2)])
+  right_slope_angle = 45
+  test_single_att_enu_2_rfu(heading, right_slope_angle)
+
+  heading = np.array([-1, 2, 3])
+  right_slope_angle = 0
+  test_single_att_enu_2_rfu(heading, right_slope_angle)
+
+  heading = np.array([-1, 2, 0.5])
+  right_slope_angle = 15
+  test_single_att_enu_2_rfu(heading, right_slope_angle)
 
 def test_single_delta_att(att_d_1, att_d_2, rot_seq):
   print('============================test single delta attitude============================')
@@ -137,6 +144,6 @@ def test_angular_rate():
 
 def test():
   test_att_ned_x_enu()
-  test_att_enu_2_rfu_by_delta_xyz()
+  test_att_enu_2_rfu()
   test_delta_att()
   test_angular_rate()

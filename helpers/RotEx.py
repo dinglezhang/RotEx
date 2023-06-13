@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
@@ -50,5 +51,35 @@ def from_two_vectors(v1, v2, self_roll_angle, is_degree):
     # the following is an equivalent algorithm with the above
     #rot_roll = Rotation.from_rotvec(v2 / np.linalg.norm(v2) * self_roll_angle)
     #rot =  rot_roll * rot
+
+  return rot
+
+'''
+Get rotation from axis Y to a vector and with axis X slope angle.
+[ToDo] change axisY to a parameter and support axisX and axisZ
+
+Args:
+  v: a target vector coming from axis Y
+  axisX_slope_angle: the slope angle of rotated axis X
+  is_degree: True is degree and False is radian for input axisX_slope_angle
+Return:
+  rotation from axis Y to the vector with axis X slope angle
+'''
+def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
+  x = v[0]
+  y = v[1]
+  z = v[2]
+  roll_z = math.atan2(-x, y)
+  roll_x = math.atan2(z, math.sqrt(x * x + y * y))
+  roll_y = 0
+
+  if axisX_slope_angle != 0:
+    if is_degree:
+      axisX_slope_angle = np.deg2rad(axisX_slope_angle)
+    roll_y = -math.asin(math.sin(axisX_slope_angle) / math.cos(roll_x))
+
+  euler_r_ZXY = np.array([roll_z, roll_x, roll_y])
+  logger.info('euler in ZXY sequence: euler(rad)%s' % np.rad2deg(euler_r_ZXY))
+  rot = Rotation.from_euler('ZXY', euler_r_ZXY, False)
 
   return rot

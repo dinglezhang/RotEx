@@ -1,5 +1,4 @@
 import logging
-import math
 
 ROTATION_SEQUENCES_INTRINSIC = [\
   # three axis rotation
