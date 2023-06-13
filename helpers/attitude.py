@@ -27,7 +27,7 @@ logger = util.get_logger()
 EULER_D_FRAME_NED_X_ENU_ZYX = np.array([-90, 180, 0])
 EULER_R_FRAME_NED_X_ENU_ZYX = np.deg2rad(EULER_D_FRAME_NED_X_ENU_ZYX)
 
-def att_ned_x_enu(att_old_frame, is_degree):
+def from_ned_x_enu(att_old_frame, is_degree):
   euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU_ZYX
   if is_degree:
     euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU_ZYX
@@ -45,9 +45,9 @@ Args:
 Return:
   body attitude RFU in ENU frame
 '''
-def att_ned_2_enu(att_ned_2_frd, is_degree):
+def from_ned_2_enu(att_ned_2_frd, is_degree):
   logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_ned_2_frd))
-  att_enu_2_rfu = att_ned_x_enu(att_ned_2_frd, is_degree)
+  att_enu_2_rfu = from_ned_x_enu(att_ned_2_frd, is_degree)
   logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_enu_2_rfu))
 
   return att_enu_2_rfu
@@ -61,9 +61,9 @@ Args:
 Return:
   body attitude FRD in NED frame
 '''
-def att_enu_2_ned(att_enu_2_rfu, is_degree):
+def from_enu_2_ned(att_enu_2_rfu, is_degree):
   logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_enu_2_rfu))
-  att_ned_2_frd = att_ned_x_enu(att_enu_2_rfu, is_degree)
+  att_ned_2_frd = from_ned_x_enu(att_enu_2_rfu, is_degree)
   logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_ned_2_frd))
 
   return att_ned_2_frd
@@ -80,7 +80,7 @@ Return:
   [0]: rotation from ENU frame to body RFU frame
   [1]: body attitude from ENU frame to body RFU frame
 '''
-def att_enu_2_rfu(heading, right_slope_angle, is_degree):
+def from_enu_2_rfu(heading, right_slope_angle, is_degree):
   rot = RotEx.from_axisY_2_vector(heading, right_slope_angle, is_degree)
 
   att_ZYX = rot.as_euler('ZYX', is_degree)
