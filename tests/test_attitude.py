@@ -36,15 +36,15 @@ def test_from_ned_x_enu_frame():
   test_single_from_enu_2_ned_frame(np.array([0, 45, 0]), np.array([0, 0, 45]))
   test_single_from_enu_2_ned_frame(np.array([0, 45, 90]), np.array([90, 45, 90]))
 
-def test_single_from_enu_2_rfu(heading, right_slope_angle):
-  print('============================test single attitude from enu to rfu============================')
+def test_single_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle):
+  print('============================test single attitude from heading in enu frame============================')
 
-  print('heading: %s right_slope_angle: %s\n' % (heading, right_slope_angle))
-  (rot, att_d_through_euler) = attitude.from_enu_2_rfu(heading, right_slope_angle, True)
+  print('heading as rfu: %s right_slope_angle: %s\n' % (heading_as_rfu, right_slope_angle))
+  (rot, att_d_through_euler) = attitude.from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, True)
 
   # test on heading vector by heading
   heading_start = np.array([0, 1, 0])
-  heading_end_expected = heading / np.linalg.norm(heading)
+  heading_end_expected = heading_as_rfu / np.linalg.norm(heading_as_rfu)
   test_rotate_vectors.test_single_rotate_vectors_once(heading_start, att_d_through_euler, 'ZYX', heading_end_expected, False)
 
   # test on right slope angle by right direction
@@ -58,18 +58,18 @@ def test_single_from_enu_2_rfu(heading, right_slope_angle):
   print('input: %s' % right_slope_angle)
   print('result: %s\n' % right_slope_angle_result)
 
-def test_from_enu_2_rfu():
-  heading = np.array([-1, 1, math.sqrt(2)])
+def test_from_heading_in_enu_frame():
+  heading_as_rfu = np.array([-1, 1, math.sqrt(2)])
   right_slope_angle = 45
-  test_single_from_enu_2_rfu(heading, right_slope_angle)
+  test_single_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle)
 
-  heading = np.array([-1, 2, 3])
+  heading_as_rfu = np.array([-1, 2, 3])
   right_slope_angle = 0
-  test_single_from_enu_2_rfu(heading, right_slope_angle)
+  test_single_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle)
 
-  heading = np.array([-1, 2, 0.5])
+  heading_as_rfu = np.array([-1, 2, 0.5])
   right_slope_angle = 15
-  test_single_from_enu_2_rfu(heading, right_slope_angle)
+  test_single_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle)
 
 def test_single_delta_att(att_d_1, att_d_2, rot_seq):
   print('============================test single delta attitude============================')
@@ -144,6 +144,6 @@ def test_angular_rate():
 
 def test():
   test_from_ned_x_enu_frame()
-  test_from_enu_2_rfu()
+  test_from_heading_in_enu_frame()
   test_delta_att()
   test_angular_rate()

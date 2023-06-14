@@ -72,19 +72,19 @@ def from_enu_2_ned_frame(rfu_in_enu_frame, is_degree):
   return frd_in_ned_frame
 
 '''
-Get attitude from ENU frame to body RFU frame, with right slope angle.
+Get attitude RFU in ENU frame by heading with right slope angle.
 Say a vector like body heading vector, it rotates from north direction to its front direction.
 
 Args:
-  heading: body heading vector in body RFU frame
+  heading_as_rfu: heading vector as body RFU frame in ENU frame
   right_slope_angle: the slope angle of body right direction
   is_degree: True is degree and False is radian for input right_slope_angle and output attitude
 Return:
   [0]: rotation from ENU frame to body RFU frame
-  [1]: attitude from ENU frame to body RFU frame
+  [1]: attitude RFU in ENU frame
 '''
-def from_enu_2_rfu(heading, right_slope_angle, is_degree):
-  rot = RotEx.from_axisY_2_vector(heading, right_slope_angle, is_degree)
+def from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, is_degree):
+  rot = RotEx.from_axisY_2_vector(heading_as_rfu, right_slope_angle, is_degree)
 
   rfu_in_enu_frame = rot.as_euler('ZYX', is_degree)
   logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
