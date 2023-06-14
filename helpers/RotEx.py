@@ -83,3 +83,70 @@ def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
   rot = Rotation.from_euler('ZXY', euler_r_ZXY, False)
 
   return rot
+
+'''
+Get rotation in new frame from it in old frame.
+The key algorithm is that the rotvec in space has no change. Just to get rotvec in the new frame.
+
+Args:
+  rot_in_old_frame: rotation in old frame
+  rot_frame_old_2_new: frame rotation from old to new
+Return:
+  rotation in new frame
+'''
+def from_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
+  rotvec_in_old_frame = rot_in_old_frame.as_rotvec()
+  logger.info('rotvec in old frame: %s' % rotvec_in_old_frame)
+
+  rotvec_in_new_frame = rot_old_2_new_frame.inv().apply(rotvec_in_old_frame)
+  logger.info('rotvec in new frame: %s' % rotvec_in_new_frame)
+
+  rot_in_new_frame = Rotation.from_rotvec(rotvec_in_new_frame)
+
+  return rot_in_new_frame
+
+'''
+  World frame definition(xyz coordinates):
+    ENU (East, North, Up)
+    NED (North, East, Down)
+
+  NED_2_ENU and ENU_2_NED are actually the same rotation.
+  So define NED_X_ENU which means to exchange each other, whose rotation sequence is 'ZYX'
+'''
+EULER_D_NED_X_ENU = np.array([-90, 180, 0])
+EULER_R_NED_X_ENU = np.deg2rad(EULER_D_NED_X_ENU)
+
+ROT_NED_X_ENU = Rotation.from_euler('ZYX', EULER_R_NED_X_ENU, False)
+
+'''
+Get rotation from NED to ENU or ENU to NED.
+
+Args:
+  none
+Return:
+  rotation from NED to ENU or ENU to NED
+'''
+def from_ned_x_enu():
+  return ROT_NED_X_ENU
+
+'''
+Get rotation from NED to ENU.
+
+Args:
+  none
+Return:
+  rotation from NED to ENU
+'''
+def from_ned_2_enu():
+  return ROT_NED_X_ENU
+
+'''
+Get rotation from ENU to NED.
+
+Args:
+  none
+Return:
+  rotation from ENU to NED
+'''
+def from_enu_2_ned():
+  return ROT_NED_X_ENU

@@ -1,10 +1,8 @@
-import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from . import util
 from . import RotEx
-from . import new_frame
 
 logger = util.get_logger()
 
@@ -12,7 +10,7 @@ logger = util.get_logger()
   Attitude is a set of euler angles how a body intrinsic rotates from the world frame to its current body frame.
 
   World frame (xyz coordinates):
-    ENU (East, North, Up)`
+    ENU (East, North, Up)
     NED (North, East, Down)
 
   Body frame (xyz coordinates):
@@ -21,52 +19,57 @@ logger = util.get_logger()
 '''
 
 '''
-  NED_2_ENU and ENU_2_NED are actually the same rotation.
-  So define NED_X_ENU which means to exchange each other, whose rotation sequence is 'ZYX'
-'''
-EULER_D_FRAME_NED_X_ENU_ZYX = np.array([-90, 180, 0])
-EULER_R_FRAME_NED_X_ENU_ZYX = np.deg2rad(EULER_D_FRAME_NED_X_ENU_ZYX)
-
-def from_ned_x_enu(att_old_frame, is_degree):
-  euler_frame_ned_x_enu = EULER_R_FRAME_NED_X_ENU_ZYX
-  if is_degree:
-    euler_frame_ned_x_enu = EULER_D_FRAME_NED_X_ENU_ZYX
-
-  att_new_frame = new_frame.euler_in_new_frame(att_old_frame, euler_frame_ned_x_enu, 'ZYX', is_degree)
-
-  return att_new_frame
-
-'''
-Get attitude in ENU frame from NED frame.
+Get attitude RFU in ENU frame from it(FRD) in NED frame, or
+get attitude FRD in NED frame from it(RFU) in ENU frame.
 
 Args:
-  att_ned_2_frd: body attitude FRD in NED frame
+  att_in_old_frame: attitude in old frame
   is_degree: True is degree and False is radian for both input and output attitudes
 Return:
-  body attitude RFU in ENU frame
+  attitude in new frame
 '''
-def from_ned_2_enu(att_ned_2_frd, is_degree):
-  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_ned_2_frd))
-  att_enu_2_rfu = from_ned_x_enu(att_ned_2_frd, is_degree)
-  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_enu_2_rfu))
+def from_ned_x_enu_frame(att_in_old_frame, is_degree):
+  rot_seq = 'ZYX'
 
-  return att_enu_2_rfu
+  rot_in_old_frame = Rotation.from_euler(rot_seq, att_in_old_frame, is_degree)
+  rot_in_new_frame = RotEx.from_rot_in_new_frame(rot_in_old_frame, RotEx.from_ned_x_enu())
+  att_in_new_frame = rot_in_new_frame.as_euler(rot_seq, is_degree)
+
+  return att_in_new_frame
 
 '''
-Get attitude in NED frame from ENU frame.
+Get attitude RFU in ENU frame from it(FRD) in NED frame.
 
 Args:
-  att_enu_2_rfu: body attitude RFU in NED frame
+  frd_in_ned_frame: attitude FRD in NED frame
   is_degree: True is degree and False is radian for both input and output attitudes
 Return:
-  body attitude FRD in NED frame
+  attitude RFU in ENU frame
 '''
-def from_enu_2_ned(att_enu_2_rfu, is_degree):
-  logger.info('attitude RFU in ENU frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_enu_2_rfu))
-  att_ned_2_frd = from_ned_x_enu(att_enu_2_rfu, is_degree)
-  logger.info('attitude FRD in NED frame: euler(%s)%s' % (util.get_angular_unit(is_degree), att_ned_2_frd))
+def from_ned_2_enu_frame(frd_in_ned_frame, is_degree):
+  logger.info('attitude FRD(%s) in NED frame: %s' % (util.get_angular_unit(is_degree), frd_in_ned_frame))
 
-  return att_ned_2_frd
+  rfu_in_enu_frame = from_ned_x_enu_frame(frd_in_ned_frame, is_degree)
+  logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
+
+  return rfu_in_enu_frame
+
+'''
+Get attitude FRD in NED frame from it(RFU) in ENU frame.
+
+Args:
+  rfu_in_enu_frame: attitude RFU in ENU frame
+  is_degree: True is degree and False is radian for both input and output attitudes
+Return:
+  attitude FRD in NED frame
+'''
+def from_enu_2_ned_frame(rfu_in_enu_frame, is_degree):
+  logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
+
+  frd_in_ned_frame = from_ned_x_enu_frame(rfu_in_enu_frame, is_degree)
+  logger.info('attitude FRD(%s) in NED frame: %s' % (util.get_angular_unit(is_degree), frd_in_ned_frame))
+
+  return frd_in_ned_frame
 
 '''
 Get attitude from ENU frame to body RFU frame, with right slope angle.
@@ -78,15 +81,15 @@ Args:
   is_degree: True is degree and False is radian for input right_slope_angle and output attitude
 Return:
   [0]: rotation from ENU frame to body RFU frame
-  [1]: body attitude from ENU frame to body RFU frame
+  [1]: attitude from ENU frame to body RFU frame
 '''
 def from_enu_2_rfu(heading, right_slope_angle, is_degree):
   rot = RotEx.from_axisY_2_vector(heading, right_slope_angle, is_degree)
 
-  att_ZYX = rot.as_euler('ZYX', is_degree)
-  logger.info('attitude in ZYX sequence: euler(%s)%s\n' % (util.get_angular_unit(is_degree), att_ZYX))
+  rfu_in_enu_frame = rot.as_euler('ZYX', is_degree)
+  logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
 
-  return rot, att_ZYX
+  return rot, rfu_in_enu_frame
 
 '''
 Get delta between two attitudes.

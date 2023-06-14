@@ -7,34 +7,34 @@ from helpers import attitude
 from . import test_util
 from . import test_rotate_vectors
 
-def test_single_from_ned_2_enu(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
-  print('============================test single attitude from NED to ENU============================')
+def test_single_from_ned_2_enu_frame(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
+  print('============================test single attitude from NED to ENU frame============================')
 
-  att_d_enu_2_rfu = attitude.from_ned_2_enu(att_d_ned_2_frd, True)
+  att_d_enu_2_rfu = attitude.from_ned_2_enu_frame(att_d_ned_2_frd, True)
   result = test_util.get_result(np.allclose(att_d_enu_2_rfu, expected_att_d_enu_2_rfu))
   print('***attitude from NED to ENU: %s***' % result)
   print('body attitude from NED to FRD:\n%s' % att_d_ned_2_frd)
   print('body attitude from ENU to RFU:\n%s\n' % att_d_enu_2_rfu)
 
-def test_single_from_enu_2_ned(att_d_enu_2_rfu, expected_att_d_ned_2_frd):
-  print('============================test single attitude from ENU to NED============================')
+def test_single_from_enu_2_ned_frame(att_d_enu_2_rfu, expected_att_d_ned_2_frd):
+  print('============================test single attitude from ENU to NED frame============================')
 
-  att_d_ned_2_frd = attitude.from_enu_2_ned(att_d_enu_2_rfu, True)
+  att_d_ned_2_frd = attitude.from_enu_2_ned_frame(att_d_enu_2_rfu, True)
   result = test_util.get_result(np.allclose(att_d_ned_2_frd, expected_att_d_ned_2_frd))
   print('***attitude from ENU to NED: %s***' % result)
   print('body attitude from ENU to RFU:\n%s' % att_d_enu_2_rfu)
   print('body attitude from NED to FRD:\n%s\n' % att_d_ned_2_frd)
 
-def test_from_ned_x_enu():
-  test_single_from_ned_2_enu(np.array([45, 0, 0]), np.array([-45, 0, 0]))
-  test_single_from_ned_2_enu(np.array([0, 45, 0]), np.array([0, 0, 45]))
-  test_single_from_ned_2_enu(np.array([0, 0, 45]), np.array([0, 45, 0]))
-  test_single_from_ned_2_enu(np.array([90, 45, 90]), np.array([0, 45, 90]))
+def test_from_ned_x_enu_frame():
+  test_single_from_ned_2_enu_frame(np.array([45, 0, 0]), np.array([-45, 0, 0]))
+  test_single_from_ned_2_enu_frame(np.array([0, 45, 0]), np.array([0, 0, 45]))
+  test_single_from_ned_2_enu_frame(np.array([0, 0, 45]), np.array([0, 45, 0]))
+  test_single_from_ned_2_enu_frame(np.array([90, 45, 90]), np.array([0, 45, 90]))
 
-  test_single_from_enu_2_ned(np.array([-45, 0, 0]), np.array([45, 0, 0]))
-  test_single_from_enu_2_ned(np.array([0, 0, 45]), np.array([0, 45, 0]))
-  test_single_from_enu_2_ned(np.array([0, 45, 0]), np.array([0, 0, 45]))
-  test_single_from_enu_2_ned(np.array([0, 45, 90]), np.array([90, 45, 90]))
+  test_single_from_enu_2_ned_frame(np.array([-45, 0, 0]), np.array([45, 0, 0]))
+  test_single_from_enu_2_ned_frame(np.array([0, 0, 45]), np.array([0, 45, 0]))
+  test_single_from_enu_2_ned_frame(np.array([0, 45, 0]), np.array([0, 0, 45]))
+  test_single_from_enu_2_ned_frame(np.array([0, 45, 90]), np.array([90, 45, 90]))
 
 def test_single_from_enu_2_rfu(heading, right_slope_angle):
   print('============================test single attitude from enu to rfu============================')
@@ -143,7 +143,7 @@ def test_angular_rate():
   test_single_angular_rate(3, att_d_1, att_d_2, 'zyx')
 
 def test():
-  test_from_ned_x_enu()
+  test_from_ned_x_enu_frame()
   test_from_enu_2_rfu()
   test_delta_att()
   test_angular_rate()
