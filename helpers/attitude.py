@@ -26,7 +26,8 @@ Args:
   att_in_old_frame: attitude in old frame
   is_degree: True is degree and False is radian for both input and output attitudes
 Return:
-  attitude in new frame
+  [0]: rotation in new frame
+  [1]: attitude in new frame
 '''
 def from_ned_x_enu_frame(att_in_old_frame, is_degree):
   rot_seq = 'ZYX'
@@ -35,7 +36,7 @@ def from_ned_x_enu_frame(att_in_old_frame, is_degree):
   rot_in_new_frame = RotEx.from_rot_in_new_frame(rot_in_old_frame, RotEx.from_ned_x_enu())
   att_in_new_frame = rot_in_new_frame.as_euler(rot_seq, is_degree)
 
-  return att_in_new_frame
+  return rot_in_new_frame, att_in_new_frame
 
 '''
 Get attitude RFU in ENU frame from it(FRD) in NED frame.
@@ -44,15 +45,16 @@ Args:
   frd_in_ned_frame: attitude FRD in NED frame
   is_degree: True is degree and False is radian for both input and output attitudes
 Return:
-  attitude RFU in ENU frame
+  [0]: rotation in ENU frame
+  [1]: attitude RFU in ENU frame
 '''
 def from_ned_2_enu_frame(frd_in_ned_frame, is_degree):
   logger.info('attitude FRD(%s) in NED frame: %s' % (util.get_angular_unit(is_degree), frd_in_ned_frame))
 
-  rfu_in_enu_frame = from_ned_x_enu_frame(frd_in_ned_frame, is_degree)
+  (rot_in_enu_frame, rfu_in_enu_frame) = from_ned_x_enu_frame(frd_in_ned_frame, is_degree)
   logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
 
-  return rfu_in_enu_frame
+  return rot_in_enu_frame, rfu_in_enu_frame
 
 '''
 Get attitude FRD in NED frame from it(RFU) in ENU frame.
@@ -61,15 +63,16 @@ Args:
   rfu_in_enu_frame: attitude RFU in ENU frame
   is_degree: True is degree and False is radian for both input and output attitudes
 Return:
-  attitude FRD in NED frame
+  [0]: rotation in NED frame
+  [1]: attitude FRD in NED frame
 '''
 def from_enu_2_ned_frame(rfu_in_enu_frame, is_degree):
   logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
 
-  frd_in_ned_frame = from_ned_x_enu_frame(rfu_in_enu_frame, is_degree)
+  (rot_in_ned_frame, frd_in_ned_frame) = from_ned_x_enu_frame(rfu_in_enu_frame, is_degree)
   logger.info('attitude FRD(%s) in NED frame: %s' % (util.get_angular_unit(is_degree), frd_in_ned_frame))
 
-  return frd_in_ned_frame
+  return rot_in_ned_frame, frd_in_ned_frame
 
 '''
 Get attitude RFU in ENU frame by heading with right slope angle.

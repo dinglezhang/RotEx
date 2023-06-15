@@ -7,23 +7,23 @@ from helpers import attitude
 from . import test_util
 from . import test_rotate_vectors
 
-def test_single_from_ned_2_enu_frame(att_d_ned_2_frd, expected_att_d_enu_2_rfu):
+def test_single_from_ned_2_enu_frame(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
   print('============================test single attitude from NED to ENU frame============================')
 
-  att_d_enu_2_rfu = attitude.from_ned_2_enu_frame(att_d_ned_2_frd, True)
-  result = test_util.get_result(np.allclose(att_d_enu_2_rfu, expected_att_d_enu_2_rfu))
+  (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.from_ned_2_enu_frame(frd_d_in_ned_frame, True)
+  result = test_util.get_result(np.allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame))
   print('***attitude from NED to ENU: %s***' % result)
-  print('body attitude from NED to FRD:\n%s' % att_d_ned_2_frd)
-  print('body attitude from ENU to RFU:\n%s\n' % att_d_enu_2_rfu)
+  print('attitude FRD in NED frame:\n%s' % frd_d_in_ned_frame)
+  print('attitude RFU in ENU fame:\n%s\n' % rfu_d_in_enu_frame)
 
-def test_single_from_enu_2_ned_frame(att_d_enu_2_rfu, expected_att_d_ned_2_frd):
+def test_single_from_enu_2_ned_frame(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame):
   print('============================test single attitude from ENU to NED frame============================')
 
-  att_d_ned_2_frd = attitude.from_enu_2_ned_frame(att_d_enu_2_rfu, True)
-  result = test_util.get_result(np.allclose(att_d_ned_2_frd, expected_att_d_ned_2_frd))
+  (rot_in_ned_frame, frd_d_in_ned_frame) = attitude.from_enu_2_ned_frame(rfu_d_in_enu_frame, True)
+  result = test_util.get_result(np.allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame))
   print('***attitude from ENU to NED: %s***' % result)
-  print('body attitude from ENU to RFU:\n%s' % att_d_enu_2_rfu)
-  print('body attitude from NED to FRD:\n%s\n' % att_d_ned_2_frd)
+  print('attitude RFU in ENU frame:\n%s' % rfu_d_in_enu_frame)
+  print('attitude FRD in NED fame:\n%s\n' % frd_d_in_ned_frame)
 
 def test_from_ned_x_enu_frame():
   test_single_from_ned_2_enu_frame(np.array([45, 0, 0]), np.array([-45, 0, 0]))
