@@ -25,7 +25,7 @@ def get_vertical_rotvec(v1, v2):
   return rot_vec
 
 '''
-Get rotation from two vectors and self roll angle.
+Get rotation from two vectors (from v1 to v2) and self roll angle.
 
 Args:
   v1, v2: two vectors, the rotation is from v1 to v2. The norm could be different between v1 and v2.
@@ -34,7 +34,7 @@ Args:
 Return:
   rotation from v1 to v2 with self roll
 '''
-def from_two_vectors(v1, v2, self_roll_angle, is_degree):
+def from_v1_2_v2(v1, v2, self_roll_angle, is_degree):
   logger.info('v1: %s v2: %s self_roll_angle(%s): %s' % (v1, v2, util.get_angular_unit(is_degree), self_roll_angle))
 
   vertical_rotvec = get_vertical_rotvec(v1, v2)
@@ -94,7 +94,7 @@ Args:
 Return:
   rotation in new frame
 '''
-def from_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
+def get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
   rotvec_in_old_frame = rot_in_old_frame.as_rotvec()
   logger.info('rotvec in old frame: %s' % rotvec_in_old_frame)
 
@@ -111,7 +111,7 @@ def from_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
     NED (North, East, Down)
 
   NED_2_ENU and ENU_2_NED are actually the same rotation.
-  So define NED_X_ENU which means to exchange each other, whose rotation sequence is 'ZYX'
+  So define NED_X_ENU which means to exchange each other, whose rotation sequence is selected as 'ZYX'
 '''
 EULER_D_NED_X_ENU = np.array([-90, 180, 0])
 EULER_R_NED_X_ENU = np.deg2rad(EULER_D_NED_X_ENU)
@@ -119,34 +119,34 @@ EULER_R_NED_X_ENU = np.deg2rad(EULER_D_NED_X_ENU)
 ROT_NED_X_ENU = Rotation.from_euler('ZYX', EULER_R_NED_X_ENU, False)
 
 '''
-Get rotation from NED to ENU or ENU to NED.
+Get frame rotation of exchange between NED and ENU.
 
 Args:
   none
 Return:
-  rotation from NED to ENU or ENU to NED
+  frame rotation of exchange between NED and ENU
 '''
-def from_ned_x_enu():
+def ned_x_enu():
   return ROT_NED_X_ENU
 
 '''
-Get rotation from NED to ENU.
+Get frame rotation from NED to ENU.
 
 Args:
   none
 Return:
-  rotation from NED to ENU
+  frame rotation from NED to ENU
 '''
 def from_ned_2_enu():
   return ROT_NED_X_ENU
 
 '''
-Get rotation from ENU to NED.
+Get frame rotation from ENU to NED.
 
 Args:
   none
 Return:
-  rotation from ENU to NED
+  frame rotation from ENU to NED
 '''
 def from_enu_2_ned():
   return ROT_NED_X_ENU

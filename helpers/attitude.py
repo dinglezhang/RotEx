@@ -19,8 +19,7 @@ logger = util.get_logger()
 '''
 
 '''
-Get attitude RFU in ENU frame from it(FRD) in NED frame, or
-get attitude FRD in NED frame from it(RFU) in ENU frame.
+Get attitude exchange between NED and ENU.
 
 Args:
   att_in_old_frame: attitude in old frame
@@ -29,11 +28,11 @@ Return:
   [0]: rotation in new frame
   [1]: attitude in new frame
 '''
-def from_ned_x_enu_frame(att_in_old_frame, is_degree):
+def change_frame_ned_x_enu(att_in_old_frame, is_degree):
   rot_seq = 'ZYX'
 
   rot_in_old_frame = Rotation.from_euler(rot_seq, att_in_old_frame, is_degree)
-  rot_in_new_frame = RotEx.from_rot_in_new_frame(rot_in_old_frame, RotEx.from_ned_x_enu())
+  rot_in_new_frame = RotEx.get_rot_in_new_frame(rot_in_old_frame, RotEx.ned_x_enu())
   att_in_new_frame = rot_in_new_frame.as_euler(rot_seq, is_degree)
 
   return rot_in_new_frame, att_in_new_frame
@@ -48,10 +47,10 @@ Return:
   [0]: rotation in ENU frame
   [1]: attitude RFU in ENU frame
 '''
-def from_ned_2_enu_frame(frd_in_ned_frame, is_degree):
+def change_frame_ned_2_enu(frd_in_ned_frame, is_degree):
   logger.info('attitude FRD(%s) in NED frame: %s' % (util.get_angular_unit(is_degree), frd_in_ned_frame))
 
-  (rot_in_enu_frame, rfu_in_enu_frame) = from_ned_x_enu_frame(frd_in_ned_frame, is_degree)
+  (rot_in_enu_frame, rfu_in_enu_frame) = change_frame_ned_x_enu(frd_in_ned_frame, is_degree)
   logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
 
   return rot_in_enu_frame, rfu_in_enu_frame
@@ -66,10 +65,10 @@ Return:
   [0]: rotation in NED frame
   [1]: attitude FRD in NED frame
 '''
-def from_enu_2_ned_frame(rfu_in_enu_frame, is_degree):
+def change_frame_enu_2_ned(rfu_in_enu_frame, is_degree):
   logger.info('attitude RFU(%s) in ENU frame: %s' % (util.get_angular_unit(is_degree), rfu_in_enu_frame))
 
-  (rot_in_ned_frame, frd_in_ned_frame) = from_ned_x_enu_frame(rfu_in_enu_frame, is_degree)
+  (rot_in_ned_frame, frd_in_ned_frame) = change_frame_ned_x_enu(rfu_in_enu_frame, is_degree)
   logger.info('attitude FRD(%s) in NED frame: %s' % (util.get_angular_unit(is_degree), frd_in_ned_frame))
 
   return rot_in_ned_frame, frd_in_ned_frame

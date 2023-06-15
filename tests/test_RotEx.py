@@ -5,10 +5,10 @@ from helpers import RotEx
 
 from . import test_rotate_vectors
 
-def test_single_from_two_vectors(v1, v2, self_roll_angle):
-  print('============================test single from two vectors============================')
+def test_single_from_v1_2_v2(v1, v2, self_roll_angle):
+  print('============================test single RotEx from v1 to v2============================')
 
-  rot = RotEx.from_two_vectors(v1, v2, self_roll_angle, True)
+  rot = RotEx.from_v1_2_v2(v1, v2, self_roll_angle, True)
   print('rot as euler(deg) in ZYX sequence: %s\n' % rot.as_euler('ZYX', True))
 
   print('test on v1 and v2')
@@ -23,16 +23,16 @@ def test_single_from_two_vectors(v1, v2, self_roll_angle):
   vertical_v2 = rot_on_v2.apply(vertical_v1)
   test_rotate_vectors.test_single_rotate_vectors_once_by_rot(vertical_v1, rot, vertical_v2, False)
 
-def test_from_two_vectors():
+def test_from_v1_2_v2():
   v1 = np.array([0, 3, 0])
   v2 = np.array([2, 3, 4])
   self_roll_angle = 0
-  test_single_from_two_vectors(v1, v2, self_roll_angle)
+  test_single_from_v1_2_v2(v1, v2, self_roll_angle)
 
   v1 = np.array([1, 2, 3])
   v2 = np.array([4, 5, 6])
   self_roll_angle = 15
-  test_single_from_two_vectors(v1, v2, self_roll_angle)
+  test_single_from_v1_2_v2(v1, v2, self_roll_angle)
 
 def test():
-  test_from_two_vectors()
+  test_from_v1_2_v2()

@@ -7,29 +7,29 @@ from helpers import attitude
 from . import test_util
 from . import test_rotate_vectors
 
-def test_single_from_ned_2_enu_frame(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
-  print('============================test single attitude from NED to ENU frame============================')
+def test_single_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
+  print('============================test single attitude change frame NED to ENU============================')
 
-  (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.from_ned_2_enu_frame(frd_d_in_ned_frame, True)
+  (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.change_frame_ned_2_enu(frd_d_in_ned_frame, True)
   result = test_util.get_result(np.allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame))
   print('***attitude from NED to ENU: %s***' % result)
   print('attitude FRD in NED frame:\n%s' % frd_d_in_ned_frame)
   print('attitude RFU in ENU fame:\n%s\n' % rfu_d_in_enu_frame)
 
 def test_single_from_enu_2_ned_frame(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame):
-  print('============================test single attitude from ENU to NED frame============================')
+  print('============================test single attitude change frame ENU to NED============================')
 
-  (rot_in_ned_frame, frd_d_in_ned_frame) = attitude.from_enu_2_ned_frame(rfu_d_in_enu_frame, True)
+  (rot_in_ned_frame, frd_d_in_ned_frame) = attitude.change_frame_enu_2_ned(rfu_d_in_enu_frame, True)
   result = test_util.get_result(np.allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame))
   print('***attitude from ENU to NED: %s***' % result)
   print('attitude RFU in ENU frame:\n%s' % rfu_d_in_enu_frame)
   print('attitude FRD in NED fame:\n%s\n' % frd_d_in_ned_frame)
 
-def test_from_ned_x_enu_frame():
-  test_single_from_ned_2_enu_frame(np.array([45, 0, 0]), np.array([-45, 0, 0]))
-  test_single_from_ned_2_enu_frame(np.array([0, 45, 0]), np.array([0, 0, 45]))
-  test_single_from_ned_2_enu_frame(np.array([0, 0, 45]), np.array([0, 45, 0]))
-  test_single_from_ned_2_enu_frame(np.array([90, 45, 90]), np.array([0, 45, 90]))
+def test_change_frame_ned_x_enu():
+  test_single_change_frame_ned_2_enu(np.array([45, 0, 0]), np.array([-45, 0, 0]))
+  test_single_change_frame_ned_2_enu(np.array([0, 45, 0]), np.array([0, 0, 45]))
+  test_single_change_frame_ned_2_enu(np.array([0, 0, 45]), np.array([0, 45, 0]))
+  test_single_change_frame_ned_2_enu(np.array([90, 45, 90]), np.array([0, 45, 90]))
 
   test_single_from_enu_2_ned_frame(np.array([-45, 0, 0]), np.array([45, 0, 0]))
   test_single_from_enu_2_ned_frame(np.array([0, 0, 45]), np.array([0, 45, 0]))
@@ -143,7 +143,7 @@ def test_angular_rate():
   test_single_angular_rate(3, att_d_1, att_d_2, 'zyx')
 
 def test():
-  test_from_ned_x_enu_frame()
+  test_change_frame_ned_x_enu()
   test_from_heading_in_enu_frame()
   test_delta_att()
   test_angular_rate()
