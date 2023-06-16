@@ -132,26 +132,21 @@ def get_delta_att(att1, att2, rot_seq, is_degree, in_world_frame):
   return delta_rot, delta_euler
 
 '''
-Get angular rate from two attitudes and time.
+Calculate angular velocity from two attitudes and time cost.
 
 Args:
-  delta_time: time cost from att1 to att2
   att1, att2: two attitudes
   rot_seq: euler angles rotation sequence
   is_degree: True is degree and False is radian for input attitudes and output augular rate
+  delta_time: time cost from att1 to att2
+  in_world_frame: True is to get angular velocity in the world frame which att1 and att2 are in originally.
+                  False is to get angular velocity in the world frame which is in after att1
 Return:
-  angular rate from att1 to att2 within time
+  angular velocity (vector) from att1 to att2 within time cost
+  angular rate (number) from att1 to att2 within time cost
 '''
-def angular_rate(delta_time, att1, att2, rot_seq, is_degree):
-  delta_rot = get_delta_att(att1, att2, rot_seq, is_degree, False)[0]
+def calc_angular_velocity(att1, att2, rot_seq, is_degree, delta_time, in_world_frame):
+  delta_rot = get_delta_att(att1, att2, rot_seq, is_degree, in_world_frame)[0]
+  (angular_velocity, angular_rate) = RotEx.calc_angular_velocity(delta_rot, delta_time, is_degree)
 
-  delta_rotvec = delta_rot.as_rotvec()
-  logger.info('delta rotvec: %s' % delta_rotvec)
-
-  angular_rate = delta_rotvec / delta_time
-  logger.info('angular rate(rad): %s' % angular_rate)
-  if is_degree:
-    angular_rate = np.rad2deg(angular_rate)
-    logger.info('angular rate(deg): %s' % angular_rate)
-
-  return angular_rate
+  return angular_velocity, angular_rate

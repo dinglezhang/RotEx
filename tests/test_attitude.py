@@ -73,12 +73,12 @@ def test_from_heading_in_enu_frame():
   right_slope_angle = 15
   test_single_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle)
 
-def test_single_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame):
+def test_single_get_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame):
   if in_world_frame:
     frame_str = 'world'
   else:
     frame_str = 'rot1'
-  print('============================test single delta attitude in %s frame============================' % frame_str)
+  print('============================test single get delta attitude in %s frame============================' % frame_str)
 
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
   rot2 = Rotation.from_euler(rot_seq, att_d_2, True)
@@ -105,12 +105,12 @@ def test_single_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame):
   vectors_by_delta_rot = delta_rot.apply(vectors_by_rot1)
 
   result = test_util.get_result(np.allclose(vectors_by_rot2, vectors_by_delta_rot))
-  print('***vectors in %s frame by rot2 and delta_rot: %s***' % (frame_str, result))
+  print('***vectors rotated in %s frame: %s***' % (frame_str, result))
   print('by rot2: %s' % vectors_by_rot2)
   print('by delta_rot: %s\n' % vectors_by_delta_rot)
 
-def test_linear_delta_att(att_d_1, factor, rot_seq):
-  print('============================test linear delta attitude============================')
+def test_single_linear_delta_att(att_d_1, factor, rot_seq):
+  print('============================test single linear delta attitude============================')
 
   # calculate att_d_2 from att_d_1 and factor (linear change on rotvec)
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
@@ -132,44 +132,44 @@ def test_linear_delta_att(att_d_1, factor, rot_seq):
   print('attitude.delta_att(): %s' % delta_euler_d)
   print('linear_delta_att: %s\n' % delta_euler_d_linear)
 
-def test_delta_att():
+def test_get_delta_att():
   att_d_1 = np.array([10, 1, 4])
   att_d_2 = np.array([11, 2, 5])
 
-  test_single_delta_att(att_d_1, att_d_2, 'ZYX', True)
-  test_single_delta_att(att_d_1, att_d_2, 'ZYX', False)
-  test_single_delta_att(att_d_1, att_d_2, 'zyx', True)
-  test_single_delta_att(att_d_1, att_d_2, 'zyx', False)
+  test_single_get_delta_att(att_d_1, att_d_2, 'ZYX', True)
+  test_single_get_delta_att(att_d_1, att_d_2, 'ZYX', False)
+  test_single_get_delta_att(att_d_1, att_d_2, 'zyx', True)
+  test_single_get_delta_att(att_d_1, att_d_2, 'zyx', False)
 
-  test_linear_delta_att(att_d_1, 1.1, 'ZYX')
-  test_linear_delta_att(att_d_1, 1.2, 'zyx')
+  test_single_linear_delta_att(att_d_1, 1.1, 'ZYX')
+  test_single_linear_delta_att(att_d_1, 1.2, 'zyx')
 
-def test_single_angular_rate(delta_time, att_d_1, att_d_2, rot_seq):
-  print('============================test single angular rate============================')
+def test_single_calc_angular_velocity(att_d_1, att_d_2, rot_seq, delta_time):
+  print('============================test single calc angular velocity============================')
 
-  angular_rate = attitude.angular_rate(delta_time, att_d_1, att_d_2, rot_seq, True)
+  angular_velocity = attitude.calc_angular_velocity(att_d_1, att_d_2, rot_seq, True, delta_time, False)[0]
 
   times = [0, delta_time]
   angles = [att_d_1, att_d_2]
   rotations = Rotation.from_euler(rot_seq, angles, True)
 
   spline = RotationSpline(times, rotations)
-  angular_rate_spline = spline(times, 1)[1]
-  angular_rate_spline = np.rad2deg(angular_rate_spline)
+  angular_velocity_spline = spline(times, 1)[1]
+  angular_velocity_spline = np.rad2deg(angular_velocity_spline)
 
-  result = test_util.get_result(np.allclose(angular_rate_spline, angular_rate))
+  result = test_util.get_result(np.allclose(angular_velocity, angular_velocity_spline))
   print('***angular rate: %s***' % result)
-  print('spline: %s' % angular_rate_spline)
-  print('actual: %s\n' % angular_rate)
+  print('result: %s' % angular_velocity)
+  print('spline: %s\n' % angular_velocity_spline)
 
-def test_angular_rate():
+def test_calc_angular_velocity():
   att_d_1 = np.array([10, 1, 4])
   att_d_2 = np.array([11, 2, 5])
-  test_single_angular_rate(2, att_d_1, att_d_2, 'ZYX')
-  test_single_angular_rate(3, att_d_1, att_d_2, 'zyx')
+  test_single_calc_angular_velocity(att_d_1, att_d_2, 'ZYX', 2)
+  test_single_calc_angular_velocity(att_d_1, att_d_2, 'zyx', 3)
 
 def test():
   test_change_frame_ned_x_enu()
   test_from_heading_in_enu_frame()
-  test_delta_att()
-  test_angular_rate()
+  test_get_delta_att()
+  test_calc_angular_velocity()

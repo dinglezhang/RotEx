@@ -170,3 +170,30 @@ Return:
 '''
 def from_enu_2_ned():
   return ROT_NED_X_ENU
+
+'''
+Calculate angular velocity by rotation and delta time.
+
+Args:
+  rot: the rotation
+  delta_time: time cost for the rotation
+  is_degree: True is degree and False is radian for output augular velocity
+Return:
+  [0]: angular velocity, which is a vecotr
+  [1]: angular rate, which is a number
+'''
+def calc_angular_velocity(rot, delta_time, is_degree):
+  rotvec = rot.as_rotvec()
+  logger.info('rotvec: %s' % rotvec)
+
+  angular_velocity = rotvec / delta_time
+  angular_rate = np.linalg.norm(angular_velocity)
+  logger.info('angular velocity(rad): %s' % angular_velocity)
+  logger.info('angular rate(rad): %s' % angular_rate)
+  if is_degree:
+    angular_velocity = np.rad2deg(angular_velocity)
+    angular_rate = np.rad2deg(angular_rate)
+    logger.info('angular velocity(deg): %s' % angular_velocity)
+    logger.info('angular rate(deg): %s' % angular_rate)
+
+  return angular_velocity, angular_rate
