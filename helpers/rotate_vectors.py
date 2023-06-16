@@ -24,7 +24,7 @@ def rotate_vectors(vectors, rot_once, times = 1, on_frame = False):
     on_str = 'on frame'
 
   logger.info('to rotate vectors %s %s' % (times_str, on_str))
-  logger.info('vectors input:\n%s' % vectors)
+  logger.info('vectors input: %s' % vectors)
 
   rot = rot_once
   for i in range(1, times):
@@ -32,7 +32,7 @@ def rotate_vectors(vectors, rot_once, times = 1, on_frame = False):
     rot = rot * rot_once
 
   vectors_rotated = rot.apply(vectors, on_frame)
-  logger.info('vectors rotated:\n%s' % vectors_rotated)
+  logger.info('vectors rotated: %s' % vectors_rotated)
 
   return vectors_rotated
 

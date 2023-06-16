@@ -85,6 +85,26 @@ def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
   return rot
 
 '''
+Get delta rotation from rot1 to rot2 in the same frame.
+Say an body may rotate to attitude1 by rot1, or to attitude2 by rot2. The function can get how it rotates from attitude1 to attitude2.
+
+Args:
+  rot1, rot2: two rotations in the same frame, from rot1 to rot2
+  in_original_frame: True is to get rotation in the frame which rot1 and rot2 are in originally.
+                     False is to get rotation in the frame which is in after rot1
+Return:
+  rotation from rot1 to rot2
+'''
+def get_delta_rot(rot1, rot2, in_original_frame):
+  rot1_inv = rot1.inv()
+  delta_rot = rot1_inv * rot2
+
+  if in_original_frame:
+    delta_rot = get_rot_in_new_frame(delta_rot, rot1_inv)
+
+  return delta_rot
+
+'''
 Get rotation in new frame from it in old frame.
 The key algorithm is that the rotvec in space has no change. Just to get rotvec in the new frame.
 
@@ -119,7 +139,7 @@ EULER_R_NED_X_ENU = np.deg2rad(EULER_D_NED_X_ENU)
 ROT_NED_X_ENU = Rotation.from_euler('ZYX', EULER_R_NED_X_ENU, False)
 
 '''
-Get frame rotation of exchange between NED and ENU.
+Get frame rotation of exchange between NED and ENU since they are same rotation.
 
 Args:
   none

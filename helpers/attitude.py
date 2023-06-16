@@ -102,29 +102,32 @@ def from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, is_degree):
   return rot, rfu_in_enu_frame
 
 '''
-Get delta between two attitudes.
+Get delta euler from att1 to att2 in the same world frame.
+Say an body may rotate to att1 or to att2 in the same world frame. The function can get how it rotates from att1 to att2.
 
 Args:
-  att1, att2: two attitudes
-  rot_seq: euler angles rotation sequence
-  is_degree: True is degree and False is radian for input attitudes and output delta euler
+  att1, att2: two attitudes in the same world frame, from att1 to att2
+  rot_seq: rotation sequence for the both attitudes
+  is_degree: True is degree and False is radian for input attitudes and output delta attitude
+  in_world_frame: True is to get delta euler in the world frame which att1 and att2 are in originally.
+                  False is to get delta euler in the world frame which is in after att1
 Return:
-  [0]: delt rotation between two attitudes
-  [1]: delta euler between two attitudes
+  [0]: delta rotation from att1 to att2
+  [1]: delta euler from att1 to att2
 '''
-def delta_att(att1, att2, rot_seq, is_degree):
+def get_delta_att(att1, att2, rot_seq, is_degree, in_world_frame):
   angular_unit = util.get_angular_unit(is_degree)
-  logger.info('two attitudes input in %s sequence:' % rot_seq)
-  logger.info('euler1(%s)%s' % (angular_unit, att1))
-  logger.info('euler2(%s)%s' % (angular_unit, att2))
+  logger.info('two attitudes(%s) input in %s sequence:' % (angular_unit, rot_seq))
+  logger.info('att1: %s' % att1)
+  logger.info('att2: %s' % att2)
 
   rot1 = Rotation.from_euler(rot_seq, att1, is_degree)
   rot2 = Rotation.from_euler(rot_seq, att2, is_degree)
 
-  delta_rot = rot1.inv() * rot2
+  delta_rot = RotEx.get_delta_rot(rot1, rot2, in_world_frame)
 
   delta_euler = delta_rot.as_euler(rot_seq, is_degree)
-  logger.info('delta euler in %s sequence: euler(%s)%s' % (rot_seq, angular_unit, delta_euler))
+  logger.info('delta euler(%s) in %s sequence: %s' % (rot_seq, angular_unit, delta_euler))
 
   return delta_rot, delta_euler
 
@@ -140,7 +143,7 @@ Return:
   angular rate from att1 to att2 within time
 '''
 def angular_rate(delta_time, att1, att2, rot_seq, is_degree):
-  delta_rot = delta_att(att1, att2, rot_seq, is_degree)[0]
+  delta_rot = get_delta_att(att1, att2, rot_seq, is_degree, False)[0]
 
   delta_rotvec = delta_rot.as_rotvec()
   logger.info('delta rotvec: %s' % delta_rotvec)

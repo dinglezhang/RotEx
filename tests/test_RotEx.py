@@ -36,3 +36,4 @@ def test_from_v1_2_v2():
 
 def test():
   test_from_v1_2_v2()
+  #tests on other RotEx functions are covered in other test modules, like test_attitude.py
