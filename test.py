@@ -2,7 +2,7 @@ import numpy as np
 
 from helpers import util
 
-from tests import test_util
+from tests import util as test_util
 from tests import test_RotEx
 from tests import test_euler
 from tests import test_attitude

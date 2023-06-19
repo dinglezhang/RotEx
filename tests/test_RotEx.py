@@ -3,7 +3,7 @@ from scipy.spatial.transform import Rotation
 
 from helpers import RotEx
 
-from . import test_util
+from . import util as test_util
 from . import test_rotate_vectors
 
 def test_single_from_v1_2_v2(v1, v2, self_roll_angle):

@@ -3,7 +3,8 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from helpers import util
-from . import test_util
+
+from . import util as test_util
 
 '''
 Print all kinds of expression of a rotation by rotation.

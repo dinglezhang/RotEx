@@ -1,7 +1,8 @@
 import numpy as np
 
 from helpers import rotate_vectors
-from . import test_util
+
+from . import util as test_util
 
 def test_single_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
   print('============================test single rotate vectors once by rot============================')

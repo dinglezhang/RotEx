@@ -4,7 +4,7 @@ from scipy.spatial.transform import Rotation, RotationSpline
 
 from helpers import attitude
 
-from . import test_util
+from . import util as test_util
 from . import test_rotate_vectors
 
 def test_single_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
