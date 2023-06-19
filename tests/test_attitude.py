@@ -83,15 +83,7 @@ def test_single_get_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame):
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
   rot2 = Rotation.from_euler(rot_seq, att_d_2, True)
 
-  vectors = np.array([
-    [1, 0, 0],
-    [0, 2, 0],
-    [0, 0, 3],
-    [0, 1, 2],
-    [1, 0, 2],
-    [1, 2, 0],
-    [3, 4, 5]
-  ])
+  vectors = test_util.get_test_vectors()
 
   if in_world_frame:
     vectors_by_rot1 = rot1.apply(vectors)
