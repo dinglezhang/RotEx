@@ -3,7 +3,7 @@ from scipy.spatial.transform import Rotation
 
 from helpers import RotEx
 
-from . import util as test_util
+from . import utils as test_utils
 from . import test_rotate_vectors
 
 def test_single_from_v1_2_v2(v1, v2, self_roll_angle):
@@ -36,7 +36,7 @@ def test_from_v1_2_v2():
   test_single_from_v1_2_v2(v1, v2, self_roll_angle)
 
 def test_single_get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
-  vectors_in_old_frame = test_util.get_test_vectors()
+  vectors_in_old_frame = test_utils.get_test_vectors()
   vectors_rotated_in_old_frame = rot_in_old_frame.apply(vectors_in_old_frame)
 
   vectors_in_new_frame = rot_old_2_new_frame.inv().apply(vectors_in_old_frame)
@@ -45,7 +45,7 @@ def test_single_get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
   rot_in_new_frame = RotEx.get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame)
   vectors_rotated_in_new_frame = rot_in_new_frame.apply(vectors_in_new_frame)
 
-  result = test_util.get_result(np.allclose(vectors_rotated_in_new_frame, vectors_rotated_in_new_frame_expected))
+  result = test_utils.get_result(np.allclose(vectors_rotated_in_new_frame, vectors_rotated_in_new_frame_expected))
   print('***vectors rotated in new frame: %s***' % result)
   print('result: %s' % vectors_rotated_in_new_frame)
   print('expected: %s\n' % vectors_rotated_in_new_frame_expected)

@@ -2,9 +2,9 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from . import util
+from . import utils
 
-logger = util.get_logger()
+logger = utils.get_logger()
 
 '''
 Get vertial rotation vector with v1 and v2, which norm is rotation angle.
@@ -35,7 +35,7 @@ Return:
   rotation from v1 to v2 with self roll
 '''
 def from_v1_2_v2(v1, v2, self_roll_angle, is_degree):
-  logger.info('v1: %s v2: %s self_roll_angle(%s): %s' % (v1, v2, util.get_angular_unit(is_degree), self_roll_angle))
+  logger.info('v1: %s v2: %s self_roll_angle(%s): %s' % (v1, v2, utils.get_angular_unit(is_degree), self_roll_angle))
 
   vertical_rotvec = get_vertical_rotvec(v1, v2)
   rot = Rotation.from_rotvec(vertical_rotvec)

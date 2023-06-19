@@ -4,14 +4,14 @@ from scipy.spatial.transform import Rotation, RotationSpline
 
 from helpers import attitude
 
-from . import util as test_util
+from . import utils as test_utils
 from . import test_rotate_vectors
 
 def test_single_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
   print('============================test single attitude change frame NED to ENU============================')
 
   (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.change_frame_ned_2_enu(frd_d_in_ned_frame, True)
-  result = test_util.get_result(np.allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame))
+  result = test_utils.get_result(np.allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame))
   print('***attitude from NED to ENU: %s***' % result)
   print('attitude FRD in NED frame: %s' % frd_d_in_ned_frame)
   print('attitude RFU in ENU fame: %s' % rfu_d_in_enu_frame)
@@ -21,7 +21,7 @@ def test_single_from_enu_2_ned_frame(rfu_d_in_enu_frame, expected_rfu_d_in_enu_f
   print('============================test single attitude change frame ENU to NED============================')
 
   (rot_in_ned_frame, frd_d_in_ned_frame) = attitude.change_frame_enu_2_ned(rfu_d_in_enu_frame, True)
-  result = test_util.get_result(np.allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame))
+  result = test_utils.get_result(np.allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame))
   print('***attitude from ENU to NED: %s***' % result)
   print('attitude RFU in ENU frame: %s' % rfu_d_in_enu_frame)
   print('attitude FRD in NED fame: %s' % frd_d_in_ned_frame)
@@ -55,7 +55,7 @@ def test_single_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle):
   right_slope_angle_result = math.atan2(right_end[2], math.sqrt(right_end[0] ** 2 + right_end[1] ** 2))
   right_slope_angle_result = np.rad2deg(right_slope_angle_result)
 
-  result = test_util.get_result(np.allclose(right_slope_angle, right_slope_angle_result))
+  result = test_utils.get_result(np.allclose(right_slope_angle, right_slope_angle_result))
   print('***right slope angle(deg): %s***' % result)
   print('input: %s' % right_slope_angle)
   print('result: %s\n' % right_slope_angle_result)
@@ -83,7 +83,7 @@ def test_single_get_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame):
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
   rot2 = Rotation.from_euler(rot_seq, att_d_2, True)
 
-  vectors = test_util.get_test_vectors()
+  vectors = test_utils.get_test_vectors()
 
   if in_world_frame:
     vectors_by_rot1 = rot1.apply(vectors)
@@ -96,7 +96,7 @@ def test_single_get_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame):
   (delta_rot, delta_euler_d) = attitude.get_delta_att(att_d_1, att_d_2, rot_seq, True, in_world_frame)
   vectors_by_delta_rot = delta_rot.apply(vectors_by_rot1)
 
-  result = test_util.get_result(np.allclose(vectors_by_rot2, vectors_by_delta_rot))
+  result = test_utils.get_result(np.allclose(vectors_by_rot2, vectors_by_delta_rot))
   print('***vectors rotated in %s frame: %s***' % (frame_str, result))
   print('by rot2: %s' % vectors_by_rot2)
   print('by delta_rot: %s\n' % vectors_by_delta_rot)
@@ -119,7 +119,7 @@ def test_single_linear_delta_att(att_d_1, factor, rot_seq):
   delta_rot_linear = Rotation.from_rotvec(delta_rotvec_linear)
   delta_euler_d_linear = delta_rot_linear.as_euler(rot_seq, True)
 
-  result = test_util.get_result(np.allclose(delta_euler_d, delta_euler_d_linear))
+  result = test_utils.get_result(np.allclose(delta_euler_d, delta_euler_d_linear))
   print('***delat att(deg) in %s sequence: %s***' % (rot_seq, result))
   print('attitude.delta_att(): %s' % delta_euler_d)
   print('linear_delta_att: %s\n' % delta_euler_d_linear)
@@ -149,7 +149,7 @@ def test_single_calc_angular_velocity(att_d_1, att_d_2, rot_seq, delta_time):
   angular_velocity_spline = spline(times, 1)[1]
   angular_velocity_spline = np.rad2deg(angular_velocity_spline)
 
-  result = test_util.get_result(np.allclose(angular_velocity, angular_velocity_spline))
+  result = test_utils.get_result(np.allclose(angular_velocity, angular_velocity_spline))
   print('***angular rate: %s***' % result)
   print('result: %s' % angular_velocity)
   print('spline: %s\n' % angular_velocity_spline)

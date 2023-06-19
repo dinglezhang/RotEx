@@ -1,8 +1,8 @@
 from scipy.spatial.transform import Rotation
 
-from . import util
+from . import utils
 
-logger = util.get_logger()
+logger = utils.get_logger()
 
 '''
 Get vectors rotated by rotation.
@@ -50,7 +50,7 @@ Return:
   vectors rotated
 '''
 def rotate_vectors_by_euler(vectors, euler, rot_seq, is_degree, times = 1, on_frame = False):
-  logger.info('euler(%s) input in %s sequence: %s' % (util.get_angular_unit(is_degree), rot_seq, euler))
+  logger.info('euler(%s) input in %s sequence: %s' % (utils.get_angular_unit(is_degree), rot_seq, euler))
 
   rot_once = Rotation.from_euler(rot_seq, euler, is_degree)
   vectors_rotated = rotate_vectors(vectors, rot_once, times, on_frame)
