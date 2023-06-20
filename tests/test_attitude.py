@@ -2,7 +2,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation, RotationSpline
 
-from helpers import attitude
+from EasyEuler import attitude
 
 from . import utils as test_utils
 from . import test_rotate_vectors

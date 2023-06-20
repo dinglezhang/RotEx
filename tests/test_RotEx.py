@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from helpers import RotEx
+from EasyEuler import RotEx
 
 from . import utils as test_utils
 from . import test_rotate_vectors

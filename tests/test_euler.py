@@ -2,7 +2,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from helpers import utils
+from EasyEuler import utils
 
 from . import utils as test_utils
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers import rotate_vectors
+from EasyEuler import rotate_vectors
 
 from . import utils as test_utils
 

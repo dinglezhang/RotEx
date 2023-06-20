@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers import utils
+from EasyEuler import utils
 
 from tests import utils as test_utils
 from tests import test_RotEx
