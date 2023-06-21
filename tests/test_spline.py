@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation, RotationSpline
 
-def test():
+def try_test():
   times = [0, 10, 20, 40]
   angles = [[-10, 20, 30], [0, 15, 40], [-30, 45, 30], [20, 45, 90]]
   rotations = Rotation.from_euler('XYZ', angles, degrees=True)

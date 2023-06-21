@@ -1,28 +1,21 @@
 import numpy as np
+from numpy.testing import assert_allclose
 
 from EasyEuler import rotate_vectors
 
-from . import utils as test_utils
-
-def test_single_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
+def single_test_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
   print('============================test single rotate vectors once by rot============================')
 
   vectors_rotated = rotate_vectors.rotate_vectors(vectors, rot, 1, on_frame)
 
-  result = test_utils.get_result(np.allclose(vectors_rotated, vectors_rotated_expected))
-  print('***vetors rotated: %s***' % result)
-  print('expected: %s' % vectors_rotated_expected)
-  print('rotated: %s\n' % vectors_rotated)
+  assert_allclose(vectors_rotated, vectors_rotated_expected)
 
-def test_single_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
+def single_test_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
   print('============================test single rotate vectors once============================')
 
   vectors_rotated = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, 1, on_frame)
 
-  result = test_utils.get_result(np.allclose(vectors_rotated, vectors_rotated_expected))
-  print('***vetors rotated: %s***' % result)
-  print('expected: %s' % vectors_rotated_expected)
-  print('rotated: %s\n' % vectors_rotated)
+  assert_allclose(vectors_rotated, vectors_rotated_expected, atol=1e-8)
 
 def test_rotate_vectors_once():
   vectors = np.array([
@@ -39,7 +32,7 @@ def test_rotate_vectors_once():
     [1, 0, 0],
     [1, 1, 1]
   ])
-  test_single_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, False)
+  single_test_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, False)
 
   vectors_rotated_expected = np.array([
     [0, 0, 1],
@@ -47,7 +40,7 @@ def test_rotate_vectors_once():
     [0, 1, 0],
     [1, 1, 1]
   ])
-  test_single_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, True)
+  single_test_rotate_vectors_once(vectors, euler_d, 'zyx', vectors_rotated_expected, True)
 
   vectors_rotated_expected = np.array([
     [0, 0, -1],
@@ -55,7 +48,7 @@ def test_rotate_vectors_once():
     [1, 0, 0],
     [1, 1, -1]
   ])
-  test_single_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, False)
+  single_test_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, False)
 
   vectors_rotated_expected = np.array([
     [0, 0, 1],
@@ -63,9 +56,9 @@ def test_rotate_vectors_once():
     [-1, 0, 0],
     [-1, 1, 1]
   ])
-  test_single_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, True)
+  single_test_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, True)
 
-def test_single_rotate_vectors_multple_times(vectors, euler_d, rot_seq, times, on_frame):
+def single_test_rotate_vectors_multple_times(vectors, euler_d, rot_seq, times, on_frame):
   print('============================test single rotate vectors %s times============================' % times)
 
   vectors_rotated_one_by_one = vectors
@@ -75,19 +68,13 @@ def test_single_rotate_vectors_multple_times(vectors, euler_d, rot_seq, times, o
 
   vectors_rotated_composed = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, times, on_frame)
 
-  result = test_utils.get_result(np.allclose(vectors_rotated_one_by_one, vectors_rotated_composed))
-  print('***vectors rotated results are SAME between one by one and composed: %s***' % result)
-  print('one by one: %s' % vectors_rotated_one_by_one)
-  print('composed: %s\n' % vectors_rotated_composed)
+  assert_allclose(vectors_rotated_one_by_one, vectors_rotated_composed)
 
   euler_d = euler_d * times
   vectors_rotated_multiply_angles = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, 1, on_frame)
 
   # [ToDo] it maybe SAME if rotation on only one axis
-  result = test_utils.get_result(not np.allclose(vectors_rotated_one_by_one, vectors_rotated_multiply_angles))
-  print('***vectors rotated results are DIFFERENT between composed and by multiply angles: %s***' % result)
-  print('composed: %s' % vectors_rotated_composed)
-  print('multiply angles: %s\n' % vectors_rotated_multiply_angles)
+  assert not np.allclose(vectors_rotated_one_by_one, vectors_rotated_multiply_angles)
 
 def test_rotate_vectors_multple_times():
   vectors = np.array([
@@ -98,11 +85,7 @@ def test_rotate_vectors_multple_times():
   ])
   euler_d = np.array([3, 3, 3])
 
-  test_single_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, False)
-  test_single_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, True)
-  test_single_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, False)
-  test_single_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, True)
-
-def test():
-  test_rotate_vectors_once()
-  test_rotate_vectors_multple_times()
+  single_test_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, False)
+  single_test_rotate_vectors_multple_times(vectors, euler_d, 'zyx', 5, True)
+  single_test_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, False)
+  single_test_rotate_vectors_multple_times(vectors, euler_d, 'ZYX', 5, True)

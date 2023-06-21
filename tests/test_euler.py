@@ -1,10 +1,9 @@
 import math
 import numpy as np
+from numpy.testing import assert_allclose
 from scipy.spatial.transform import Rotation
 
 from EasyEuler import utils
-
-from . import utils as test_utils
 
 '''
 Print all kinds of expression of a rotation by rotation.
@@ -29,9 +28,8 @@ def rot_2_x(rot, is_degree):
   norm_rotvec = np.linalg.norm(rotvec)
   norm_mrp = np.linalg.norm(mrp)
 
-  result = test_utils.get_result(np.allclose(cross_rotvec_mrp, [0, 0, 0]) and    # the two are parallel
-                                np.allclose(math.tan(norm_rotvec/4), norm_mrp)) # angle relation
-  print('***rotvec and mrp output: %s***' % result)
+  assert_allclose(cross_rotvec_mrp, [0, 0, 0], atol=1e-8)        # the two are parallel
+  assert_allclose(math.tan(norm_rotvec/4), norm_mrp)  # angle relation
 
   if is_degree:
     norm_rotvec = np.rad2deg(norm_rotvec)
@@ -86,10 +84,7 @@ def euler_one_by_one(euler, rot_seq, is_degree):
   rot_one_by_one = rot1 * rot2 * rot3
   euler_one_by_one = rot_one_by_one.as_euler(rot_seq, is_degree)
 
-  result = test_utils.get_result(np.allclose(euler_once, euler_one_by_one))
-  print('***euler(%s) between once and one by one: %s***' % (angular_unit, result))
-  print('once: %s' % euler_once)
-  print('one by one: %s\n' % euler_one_by_one)
+  assert_allclose(euler_one_by_one, euler_once)
 
 def test_euler_2_x():
   print('============================test euler2x============================')
@@ -106,7 +101,3 @@ def test_euler_one_by_one():
   for seq in utils.ROTATION_SEQUENCES_INTRINSIC:
     euler_one_by_one(euler_d_input, seq, True)
     break # remove it to test all rotation sequences
-
-def test():
-  test_euler_2_x()
-  test_euler_one_by_one()

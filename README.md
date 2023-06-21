@@ -19,4 +19,4 @@ Make Euler Angles easy, not dizzy!
 
 # Get started
 
-Run test.py in the root. It calls tests on all functions provided in helpers folder.
+Run test.py in the root. It calls tests on all functions provided in EasyEuler folder.
