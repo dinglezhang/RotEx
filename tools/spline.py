@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation, RotationSpline
 
-def try_test():
+def try_spline():
   times = [0, 10, 20, 40]
   angles = [[-10, 20, 30], [0, 15, 40], [-30, 45, 30], [20, 45, 90]]
   rotations = Rotation.from_euler('XYZ', angles, degrees=True)
@@ -32,3 +32,6 @@ def try_test():
   plt.plot(times, angular_acceleration, 'x')
   plt.title("Angular acceleration")
   plt.show()
+
+if __name__ == '__main__':
+  try_spline()

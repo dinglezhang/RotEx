@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
 
-def try_test():
+def try_slerp():
   times = [0, 10, 20, 40]
   angles = [[-10, 20, 30], [0, 15, 40], [-30, 45, 30], [20, 45, 90]]
   rotations = Rotation.from_euler('XYZ', angles, degrees=True)
@@ -18,3 +18,6 @@ def try_test():
   plt.plot(times, angles, 'x')
   plt.plot("Euler angles")
   plt.show()
+
+if __name__ == '__main__':
+  try_slerp()

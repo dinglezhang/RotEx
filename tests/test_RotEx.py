@@ -7,17 +7,13 @@ from EasyEuler import RotEx
 from . import test_rotate_vectors
 
 def single_test_from_v1_2_v2(v1, v2, self_roll_angle):
-  print('============================test single RotEx from v1 to v2============================')
-
   rot = RotEx.from_v1_2_v2(v1, v2, self_roll_angle, True)
-  print('rot as euler(deg) in ZYX sequence: %s\n' % rot.as_euler('ZYX', True))
 
-  print('test on v1 and v2')
+  # test on v1 and v2
   v2_expected = v2 / np.linalg.norm(v2) * np.linalg.norm(v1)
   test_rotate_vectors.single_test_rotate_vectors_once_by_rot(v1, rot, v2_expected, False)
 
   # test on a vector vertical with v1 and v2, which can reflect change on self_roll_angle
-  print('test on vertical v1 and v2')
   vertical_v1 = RotEx.get_vertical_rotvec(v1, v2)
   self_roll_angle = np.deg2rad(self_roll_angle)
   rot_on_v2 = Rotation.from_rotvec(v2 / np.linalg.norm(v2) * self_roll_angle)

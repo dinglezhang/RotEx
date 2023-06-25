@@ -8,14 +8,10 @@ from EasyEuler import attitude
 from . import test_rotate_vectors
 
 def single_test_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
-  print('============================test single attitude change frame NED to ENU============================')
-
   (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.change_frame_ned_2_enu(frd_d_in_ned_frame, True)
   assert_allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame)
 
 def single_test_from_enu_2_ned_frame(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame):
-  print('============================test single attitude change frame ENU to NED============================')
-
   (rot_in_ned_frame, frd_d_in_ned_frame) = attitude.change_frame_enu_2_ned(rfu_d_in_enu_frame, True)
   assert_allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame, atol=1e-8)
 
@@ -31,9 +27,6 @@ def test_change_frame_ned_x_enu():
   single_test_from_enu_2_ned_frame(np.array([-90, 45, 90]), np.array([90, 45, 90]))
 
 def single_test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle):
-  print('============================test single attitude from heading in enu frame============================')
-
-  print('heading as rfu: %s right_slope_angle: %s\n' % (heading_as_rfu, right_slope_angle))
   (rot, att_d_through_euler) = attitude.from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, True)
 
   # test on heading vector by heading
@@ -63,12 +56,6 @@ def test_from_heading_in_enu_frame():
   single_test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle)
 
 def single_test_get_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame, vector_samples):
-  if in_world_frame:
-    frame_str = 'world'
-  else:
-    frame_str = 'rot1'
-  print('============================test single get delta attitude in %s frame============================' % frame_str)
-
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
   rot2 = Rotation.from_euler(rot_seq, att_d_2, True)
 
@@ -86,8 +73,6 @@ def single_test_get_delta_att(att_d_1, att_d_2, rot_seq, in_world_frame, vector_
   assert_allclose(vectors_by_rot2, vectors_by_delta_rot)
 
 def single_test_linear_delta_att(att_d_1, factor, rot_seq):
-  print('============================test single linear delta attitude============================')
-
   # calculate att_d_2 from att_d_1 and factor (linear change on rotvec)
   rot1 = Rotation.from_euler(rot_seq, att_d_1, True)
   rotvec1 = rot1.as_rotvec()
@@ -118,8 +103,6 @@ def test_get_delta_att(vector_samples):
   single_test_linear_delta_att(att_d_1, 1.2, 'zyx')
 
 def single_test_calc_angular_velocity(att_d_1, att_d_2, rot_seq, delta_time):
-  print('============================test single calc angular velocity============================')
-
   angular_velocity = attitude.calc_angular_velocity(att_d_1, att_d_2, rot_seq, True, delta_time, False)[0]
 
   times = [0, delta_time]

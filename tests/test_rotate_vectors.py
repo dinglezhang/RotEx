@@ -4,17 +4,11 @@ from numpy.testing import assert_allclose
 from EasyEuler import rotate_vectors
 
 def single_test_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
-  print('============================test single rotate vectors once by rot============================')
-
   vectors_rotated = rotate_vectors.rotate_vectors(vectors, rot, 1, on_frame)
-
   assert_allclose(vectors_rotated, vectors_rotated_expected)
 
 def single_test_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
-  print('============================test single rotate vectors once============================')
-
   vectors_rotated = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, 1, on_frame)
-
   assert_allclose(vectors_rotated, vectors_rotated_expected, atol=1e-8)
 
 def test_rotate_vectors_once():
@@ -59,11 +53,8 @@ def test_rotate_vectors_once():
   single_test_rotate_vectors_once(vectors, euler_d, 'ZYX', vectors_rotated_expected, True)
 
 def single_test_rotate_vectors_multple_times(vectors, euler_d, rot_seq, times, on_frame):
-  print('============================test single rotate vectors %s times============================' % times)
-
   vectors_rotated_one_by_one = vectors
   for i in range(1, times + 1):
-    print('@%s time' % i)
     vectors_rotated_one_by_one = rotate_vectors.rotate_vectors_by_euler(vectors_rotated_one_by_one, euler_d, rot_seq, True, 1, on_frame)
 
   vectors_rotated_composed = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, times, on_frame)
