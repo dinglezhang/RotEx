@@ -28,24 +28,31 @@ def test_from_enu_2_ned_frame(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame):
 
 @pytest.mark.parametrize('heading_as_rfu',
                         [np.array([-1, 1, math.sqrt(2)]),
-                         #np.array([-1, 2, 3]), [ToDo] make it pass
+                         np.array([-1, 2, 3]),
                          np.array([-1, 2, 0.5])])
-@pytest.mark.parametrize('right_slope_angle', [0, 15, 45, -30])
-def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle):
-  (rot, att_d_through_euler) = attitude.from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, True)
+@pytest.mark.parametrize('right_slope_angle_d', [0, 15, 45, -30])
+def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
+  roll_x = math.atan2(heading_as_rfu[2], math.sqrt(heading_as_rfu[0] ** 2 + heading_as_rfu[1] ** 2))
+  sin_roll_y = math.sin(np.deg2rad(right_slope_angle_d)) / math.cos(roll_x)
 
-  # test on heading vector by heading
-  heading_start = np.array([0, 1, 0])
-  heading_end_expected = heading_as_rfu / np.linalg.norm(heading_as_rfu)
-  test_rotate_vectors.test_rotate_vectors_once(heading_start, att_d_through_euler, 'ZYX', heading_end_expected, False)
+  if sin_roll_y < -1 or sin_roll_y > 1:
+    with pytest.raises(ValueError,  match='It is impossible to rotate to the vector'):
+      attitude.from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d, True)
+  else:
+    (rot, att_d_through_euler) = attitude.from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d, True)
 
-  # test on right slope angle by right direction
-  right_start = np.array([1, 0, 0])
-  right_end = rot.apply(right_start)
-  right_slope_angle_result = math.atan2(right_end[2], math.sqrt(right_end[0] ** 2 + right_end[1] ** 2))
-  right_slope_angle_result = np.rad2deg(right_slope_angle_result)
+    # test on heading vector by heading
+    heading_start = np.array([0, 1, 0])
+    heading_end_expected = heading_as_rfu / np.linalg.norm(heading_as_rfu)
+    test_rotate_vectors.test_rotate_vectors_once(heading_start, att_d_through_euler, 'ZYX', heading_end_expected, False)
 
-  assert_allclose(right_slope_angle_result, right_slope_angle, atol=1e-8)
+    # test on right slope angle by right direction
+    right_start = np.array([1, 0, 0])
+    right_end = rot.apply(right_start)
+    right_slope_angle_result = math.atan2(right_end[2], math.sqrt(right_end[0] ** 2 + right_end[1] ** 2))
+    right_slope_angle_result = np.rad2deg(right_slope_angle_result)
+
+    assert_allclose(right_slope_angle_result, right_slope_angle_d, atol=1e-8)
 
 @pytest.mark.parametrize('att_d_1', [np.array([10, 1, 4])])
 @pytest.mark.parametrize('att_d_2', [np.array([11, 2, 5])])

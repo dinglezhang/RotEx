@@ -11,3 +11,6 @@ if __name__ == '__main__':
   np.set_printoptions(precision = 8, suppress = True)
 
   pytest.main()
+  #pytest.main(['-s', '-v'])
+  #pytest.main(['-s', '-v', 'tests/test_attitude.py'])
+  #pytest.main(['-s', '-v', 'tests/test_attitude.py::test_from_heading_in_enu_frame'])

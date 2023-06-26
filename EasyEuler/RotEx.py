@@ -64,6 +64,8 @@ Args:
   is_degree: True is degree and False is radian for input axisX_slope_angle
 Return:
   rotation from axis Y to the vector with axis X slope angle
+Raise:
+  ValueError: If it is impossible to rotate to the vector with the slope angle
 '''
 def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
   x = v[0]
@@ -75,11 +77,22 @@ def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
 
   if axisX_slope_angle != 0:
     if is_degree:
-      axisX_slope_angle = np.deg2rad(axisX_slope_angle)
-    roll_y = -math.asin(math.sin(axisX_slope_angle) / math.cos(roll_x))
+      axisX_slope_angle_r = np.deg2rad(axisX_slope_angle)
+    else:
+      axisX_slope_angle_r = axisX_slope_angle
+
+    sin_roll_y = math.sin(axisX_slope_angle_r) / math.cos(roll_x)
+    if sin_roll_y >= -1 and sin_roll_y <= 1:
+      roll_y = -math.asin(sin_roll_y)
+    else:
+      max_slope_angle = abs(math.asin(math.cos(roll_x)))
+      if is_degree:
+        max_slope_angle = np.rad2deg(max_slope_angle)
+
+      raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (axisX_slope_angle, -max_slope_angle, max_slope_angle))
 
   euler_r_ZXY = np.array([roll_z, roll_x, roll_y])
-  logger.info('euler in ZXY sequence: euler(rad)%s' % np.rad2deg(euler_r_ZXY))
+  logger.info('euler(rad) in ZXY sequence: %s' % euler_r_ZXY)
   rot = Rotation.from_euler('ZXY', euler_r_ZXY, False)
 
   return rot
