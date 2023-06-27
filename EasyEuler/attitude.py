@@ -22,6 +22,9 @@ logger = utils.get_logger()
     yaw-pitch-roll is 'ZYX' as attitude FRD in NED frame
 '''
 
+ATT_ROT_SEQ_IN_ENU_FRAME = 'ZXY'
+ATT_ROT_SEQ_IN_NED_FRAME = 'ZYX'
+
 '''
 Get attitude exchange between NED and ENU.
 
@@ -53,7 +56,8 @@ Return:
   [0]: rotation in ENU frame
   [1]: attitude RFU in ENU frame
 '''
-def change_frame_ned_2_enu(frd_in_ned_frame, is_degree, rot_seq_in_ned_frame = 'ZYX', rot_seq_in_enu_frame = 'ZXY'):
+def change_frame_ned_2_enu(frd_in_ned_frame, is_degree,
+                           rot_seq_in_ned_frame = ATT_ROT_SEQ_IN_NED_FRAME, rot_seq_in_enu_frame = ATT_ROT_SEQ_IN_ENU_FRAME):
   logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
 
   (rot_in_enu_frame, rfu_in_enu_frame) = change_frame_ned_x_enu(frd_in_ned_frame, is_degree, rot_seq_in_ned_frame, rot_seq_in_enu_frame)
@@ -73,7 +77,8 @@ Return:
   [0]: rotation in NED frame
   [1]: attitude FRD in NED frame
 '''
-def change_frame_enu_2_ned(rfu_in_enu_frame, is_degree, rot_seq_in_enu_frame = 'ZXY', rot_seq_in_ned_frame = 'ZYX'):
+def change_frame_enu_2_ned(rfu_in_enu_frame, is_degree,
+                           rot_seq_in_enu_frame = ATT_ROT_SEQ_IN_ENU_FRAME, rot_seq_in_ned_frame = ATT_ROT_SEQ_IN_NED_FRAME):
   logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
 
   (rot_in_ned_frame, frd_in_ned_frame) = change_frame_ned_x_enu(rfu_in_enu_frame, is_degree, rot_seq_in_enu_frame, rot_seq_in_ned_frame)
@@ -89,17 +94,41 @@ Args:
   heading_as_rfu: heading vector as body RFU frame in ENU frame
   right_slope_angle: the slope angle of body right direction
   is_degree: True is degree and False is radian for input right_slope_angle and output attitude
+  rot_seq: rotation sequence in ENU frame, ZXY by default
 Return:
   [0]: rotation from ENU frame to body RFU frame
   [1]: attitude RFU in ENU frame
 '''
-def from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, is_degree):
+def from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, is_degree,
+                              rot_seq = ATT_ROT_SEQ_IN_ENU_FRAME):
   rot = RotEx.from_axisY_2_vector(heading_as_rfu, right_slope_angle, is_degree)
 
-  rfu_in_enu_frame = rot.as_euler('ZYX', is_degree)
+  rfu_in_enu_frame = rot.as_euler(rot_seq, is_degree)
   logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
 
   return rot, rfu_in_enu_frame
+
+'''
+Get attitude FRD in NED frame by heading with right slope angle.
+Say a vector like body heading vector, it rotates from east direction to its front direction.
+
+Args:
+  heading_as_frd: heading vector as body FRD frame in NED frame
+  right_slope_angle: the slope angle of body right direction
+  is_degree: True is degree and False is radian for input right_slope_angle and output attitude
+  rot_seq: rotation sequence in NED frame, ZYX by default
+Return:
+  [0]: rotation from NED frame to body FRD frame
+  [1]: attitude FRD in NED frame
+'''
+def from_heading_in_ned_frame(heading_as_frd, right_slope_angle, is_degree,
+                              rot_seq = ATT_ROT_SEQ_IN_NED_FRAME):
+  rot = RotEx.from_axisX_2_vector(heading_as_frd, -right_slope_angle, is_degree)
+
+  frd_in_ned_frame = rot.as_euler(rot_seq, is_degree)
+  logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
+
+  return rot, frd_in_ned_frame
 
 '''
 Get delta euler from att1 to att2 in the same world frame.
@@ -107,7 +136,7 @@ Say an body may rotate to att1 or to att2 in the same world frame. The function 
 
 Args:
   att1, att2: two attitudes in the same world frame, from att1 to att2
-  rot_seq: rotation sequence for the both attitudes
+  rot_seq: rotation sequence for the both input attitudes and output delta euler
   is_degree: True is degree and False is radian for input attitudes and output delta attitude
   in_world_frame: True is to get delta euler in the world frame which att1 and att2 are in originally.
                   False is to get delta euler in the world frame which is in after att1

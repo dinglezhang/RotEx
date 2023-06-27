@@ -56,7 +56,6 @@ def from_v1_2_v2(v1, v2, self_roll_angle, is_degree):
 
 '''
 Get rotation from axis Y to a vector and with axis X slope angle.
-[ToDo] change axisY to a parameter and support axisX and axisZ
 
 Args:
   v: a target vector coming from axis Y
@@ -68,11 +67,8 @@ Raise:
   ValueError: If it is impossible to rotate to the vector with the slope angle
 '''
 def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
-  x = v[0]
-  y = v[1]
-  z = v[2]
-  roll_z = math.atan2(-x, y)
-  roll_x = math.atan2(z, math.sqrt(x * x + y * y))
+  roll_z = -math.atan2(v[0], v[1])
+  roll_x = utils.calc_angle_of_vector_against_XY_plane(v)
   roll_y = 0
 
   if axisX_slope_angle != 0:
@@ -94,6 +90,45 @@ def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
   euler_r_ZXY = np.array([roll_z, roll_x, roll_y])
   logger.info('euler(rad) in ZXY sequence: %s' % euler_r_ZXY)
   rot = Rotation.from_euler('ZXY', euler_r_ZXY, False)
+
+  return rot
+
+'''
+Get rotation from axis X to a vector and with axis Y slope angle.
+
+Args:
+  v: a target vector coming from axis X
+  axisY_slope_angle: the slope angle of rotated axis Y
+  is_degree: True is degree and False is radian for input axisY_slope_angle
+Return:
+  rotation from axis X to the vector with axis Y slope angle
+Raise:
+  ValueError: If it is impossible to rotate to the vector with the slope angle
+'''
+def from_axisX_2_vector(v, axisY_slope_angle, is_degree):
+  roll_z = math.atan2(v[1], v[0])
+  roll_y = -utils.calc_angle_of_vector_against_XY_plane(v)
+  roll_x = 0
+
+  if axisY_slope_angle != 0:
+    if is_degree:
+      axisY_slope_angle_r = np.deg2rad(axisY_slope_angle)
+    else:
+      axisY_slope_angle_r = axisY_slope_angle
+
+    sin_roll_x = math.sin(axisY_slope_angle_r) / math.cos(roll_y)
+    if sin_roll_x >= -1 and sin_roll_x <= 1:
+      roll_x = math.asin(sin_roll_x)
+    else:
+      max_slope_angle = abs(math.asin(math.cos(roll_y)))
+      if is_degree:
+        max_slope_angle = np.rad2deg(max_slope_angle)
+
+      raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (axisY_slope_angle, -max_slope_angle, max_slope_angle))
+
+  euler_r_ZYX = np.array([roll_z, roll_y, roll_x])
+  logger.info('euler(rad) in ZYX sequence: %s' % euler_r_ZYX)
+  rot = Rotation.from_euler('ZYX', euler_r_ZYX, False)
 
   return rot
 
