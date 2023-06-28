@@ -55,37 +55,65 @@ def from_v1_2_v2(v1, v2, self_roll_angle, is_degree):
   return rot
 
 '''
-Get rotation from axis Y to a vector and with axis X slope angle.
+Analyze rotation from x or y axis to a vector and with an angle between cross vector and xy plane, against xy plane
+All input and output angle is radian unit
 
 Args:
-  v: a target vector coming from axis Y
-  axisX_slope_angle: the slope angle of rotated axis X
-  is_degree: True is degree and False is radian for input axisX_slope_angle
+  v: a target vector
+  angle_crossv_and_xy_plane: angle between cross vector of the target vector and xy plane
 Return:
-  rotation from axis Y to the vector with axis X slope angle
+  [0]: True or False for the possibility
+  [1]: angle between vector and xy plane
+  [2]: angle of self roll of the vector, which is with value only if the possibility is True
+  [3]: max possible angle between cross vector and xy plane, which is with value only if the possibility is False
+'''
+def _analyze_vector_and_angle_against_xy_plane(v, angle_crossv_and_xy_plane):
+  is_possible = False
+
+  angle_v_and_xy_plane = utils.calc_angle_between_vector_and_xy_plane(v)
+
+  sin_angle_self_roll = math.sin(angle_crossv_and_xy_plane) / math.cos(angle_v_and_xy_plane)
+
+  angle_self_roll = None
+  if sin_angle_self_roll >= -1 and sin_angle_self_roll <= 1:
+    is_possible = True
+    angle_self_roll = math.asin(sin_angle_self_roll)
+
+  max_angle_crossv_and_xy_plane = None
+  if not is_possible:
+    max_angle_crossv_and_xy_plane = abs(math.asin(math.cos(angle_v_and_xy_plane)))
+
+  return is_possible, angle_v_and_xy_plane, angle_self_roll, max_angle_crossv_and_xy_plane
+
+'''
+Get rotation from y-axis to a vector and with x-axis slope angle.
+
+Args:
+  v: a target vector coming from y-axis
+  x-axis_slope_angle: the slope angle of rotated x-axis
+  is_degree: True is degree and False is radian for input x-axis_slope_angle
+Return:
+  rotation from y-axis to the vector with x-axis slope angle
 Raise:
   ValueError: If it is impossible to rotate to the vector with the slope angle
 '''
-def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
+def from_y_axis_2_vector(v, x_axis_slope_angle, is_degree):
   roll_z = -math.atan2(v[0], v[1])
-  roll_x = utils.calc_angle_of_vector_against_XY_plane(v)
+  roll_x = 0
   roll_y = 0
 
-  if axisX_slope_angle != 0:
+  if is_degree:
+    x_axis_slope_angle = np.deg2rad(x_axis_slope_angle)
+
+  (is_possible, roll_x, angle_self_roll, max_slope_angle) = _analyze_vector_and_angle_against_xy_plane(v, x_axis_slope_angle)
+
+  if is_possible:
+    roll_y = -angle_self_roll
+  else:
     if is_degree:
-      axisX_slope_angle_r = np.deg2rad(axisX_slope_angle)
-    else:
-      axisX_slope_angle_r = axisX_slope_angle
+      max_slope_angle = np.rad2deg(max_slope_angle)
 
-    sin_roll_y = math.sin(axisX_slope_angle_r) / math.cos(roll_x)
-    if sin_roll_y >= -1 and sin_roll_y <= 1:
-      roll_y = -math.asin(sin_roll_y)
-    else:
-      max_slope_angle = abs(math.asin(math.cos(roll_x)))
-      if is_degree:
-        max_slope_angle = np.rad2deg(max_slope_angle)
-
-      raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (axisX_slope_angle, -max_slope_angle, max_slope_angle))
+    raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (x_axis_slope_angle, -max_slope_angle, max_slope_angle))
 
   euler_r_ZXY = np.array([roll_z, roll_x, roll_y])
   logger.info('euler(rad) in ZXY sequence: %s' % euler_r_ZXY)
@@ -94,39 +122,35 @@ def from_axisY_2_vector(v, axisX_slope_angle, is_degree):
   return rot
 
 '''
-Get rotation from axis X to a vector and with axis Y slope angle.
+Get rotation from x-axis to a vector and with y-axis slope angle.
 
 Args:
-  v: a target vector coming from axis X
-  axisY_slope_angle: the slope angle of rotated axis Y
-  is_degree: True is degree and False is radian for input axisY_slope_angle
+  v: a target vector coming from x-axis
+  y-axis_slope_angle: the slope angle of rotated y-axis
+  is_degree: True is degree and False is radian for input y-axis_slope_angle
 Return:
-  rotation from axis X to the vector with axis Y slope angle
+  rotation from x-axis to the vector with y-axis slope angle
 Raise:
   ValueError: If it is impossible to rotate to the vector with the slope angle
 '''
-def from_axisX_2_vector(v, axisY_slope_angle, is_degree):
+def from_x_axis_2_vector(v, y_axis_slope_angle, is_degree):
   roll_z = math.atan2(v[1], v[0])
-  roll_y = -utils.calc_angle_of_vector_against_XY_plane(v)
+  roll_y = 0
   roll_x = 0
 
-  if axisY_slope_angle != 0:
+  if is_degree:
+    y_axis_slope_angle = np.deg2rad(y_axis_slope_angle)
+
+  (is_possible, roll_y, angle_self_roll, max_slope_angle) = _analyze_vector_and_angle_against_xy_plane(v, y_axis_slope_angle)
+  if is_possible:
+    roll_x = angle_self_roll
+  else:
     if is_degree:
-      axisY_slope_angle_r = np.deg2rad(axisY_slope_angle)
-    else:
-      axisY_slope_angle_r = axisY_slope_angle
+      max_slope_angle = np.rad2deg(max_slope_angle)
 
-    sin_roll_x = math.sin(axisY_slope_angle_r) / math.cos(roll_y)
-    if sin_roll_x >= -1 and sin_roll_x <= 1:
-      roll_x = math.asin(sin_roll_x)
-    else:
-      max_slope_angle = abs(math.asin(math.cos(roll_y)))
-      if is_degree:
-        max_slope_angle = np.rad2deg(max_slope_angle)
+    raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (y_axis_slope_angle, -max_slope_angle, max_slope_angle))
 
-      raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (axisY_slope_angle, -max_slope_angle, max_slope_angle))
-
-  euler_r_ZYX = np.array([roll_z, roll_y, roll_x])
+  euler_r_ZYX = np.array([roll_z, -roll_y, roll_x])
   logger.info('euler(rad) in ZYX sequence: %s' % euler_r_ZYX)
   rot = Rotation.from_euler('ZYX', euler_r_ZYX, False)
 

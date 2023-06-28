@@ -5,6 +5,7 @@ from numpy.testing import assert_allclose
 from scipy.spatial.transform import Rotation, RotationSpline
 
 from EasyEuler import utils
+from EasyEuler import RotEx
 from EasyEuler import attitude
 
 from . import test_rotate_vectors
@@ -33,10 +34,9 @@ def test_from_enu_2_ned_frame(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame):
                          np.array([-1, 2, 0.5])])
 @pytest.mark.parametrize('right_slope_angle_d', [0, 15, 45, -30])
 def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
-  roll_x = utils.calc_angle_of_vector_against_XY_plane(heading_as_rfu)
-  sin_roll_y = math.sin(np.deg2rad(right_slope_angle_d)) / math.cos(roll_x)
+  is_possible = RotEx._analyze_vector_and_angle_against_xy_plane(heading_as_rfu, np.deg2rad(right_slope_angle_d))[0]
 
-  if sin_roll_y < -1 or sin_roll_y > 1:
+  if not is_possible:
     with pytest.raises(ValueError,  match='It is impossible to rotate to the vector'):
       attitude.from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d, True)
   else:
@@ -51,8 +51,7 @@ def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
     # test on right slope angle by right direction
     right_start = np.array([1, 0, 0])
     right_end = rot.apply(right_start)
-    right_slope_angle_result = utils.calc_angle_of_vector_against_XY_plane(right_end)
-    right_slope_angle_result = np.rad2deg(right_slope_angle_result)
+    right_slope_angle_result = utils.calc_angle_between_vector_and_xy_plane(right_end, True)
 
     assert_allclose(right_slope_angle_result, right_slope_angle_d, atol=1e-8)
 
@@ -62,10 +61,9 @@ def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
                          np.array([-1, 2, 0.5])])
 @pytest.mark.parametrize('right_slope_angle_d', [0, 15, 45, -30])
 def test_from_heading_in_ned_frame(heading_as_frd, right_slope_angle_d):
-  roll_y = -utils.calc_angle_of_vector_against_XY_plane(heading_as_frd)
-  sin_roll_x = math.sin(np.deg2rad(-right_slope_angle_d)) / math.cos(roll_y)
+  is_possible = RotEx._analyze_vector_and_angle_against_xy_plane(heading_as_frd, np.deg2rad(right_slope_angle_d))[0]
 
-  if sin_roll_x < -1 or sin_roll_x > 1:
+  if not is_possible:
     with pytest.raises(ValueError,  match='It is impossible to rotate to the vector'):
       attitude.from_heading_in_ned_frame(heading_as_frd, right_slope_angle_d, True)
   else:
@@ -80,8 +78,7 @@ def test_from_heading_in_ned_frame(heading_as_frd, right_slope_angle_d):
     # test on right slope angle by right direction
     right_start = np.array([0, 1, 0])
     right_end = rot.apply(right_start)
-    right_slope_angle_result = -utils.calc_angle_of_vector_against_XY_plane(right_end)
-    right_slope_angle_result = np.rad2deg(right_slope_angle_result)
+    right_slope_angle_result = -utils.calc_angle_between_vector_and_xy_plane(right_end, True)
 
     assert_allclose(right_slope_angle_result, right_slope_angle_d, atol=1e-8)
 

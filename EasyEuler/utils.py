@@ -30,15 +30,15 @@ def get_angular_unit(is_degree):
   return unit
 
 '''
-Calculate the angle of a vector against XY plane.
+Calculate the angle between a vector and xy plane.
 
 Args:
   v: a vector
   is_degree: True is degree and False is radian for output angle
 Return:
-  the angle of the vector against XY plane
+  the angle between the vector and xy plane
 '''
-def calc_angle_of_vector_against_XY_plane(v, is_degree = False):
+def calc_angle_between_vector_and_xy_plane(v, is_degree = False):
   angle = math.atan2(v[2], math.sqrt(v[0] ** 2 + v[1] ** 2))
   if is_degree:
     angle = np.rad2deg(angle)

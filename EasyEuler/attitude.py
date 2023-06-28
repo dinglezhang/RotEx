@@ -101,7 +101,7 @@ Return:
 '''
 def from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, is_degree,
                               rot_seq = ATT_ROT_SEQ_IN_ENU_FRAME):
-  rot = RotEx.from_axisY_2_vector(heading_as_rfu, right_slope_angle, is_degree)
+  rot = RotEx.from_y_axis_2_vector(heading_as_rfu, right_slope_angle, is_degree)
 
   rfu_in_enu_frame = rot.as_euler(rot_seq, is_degree)
   logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
@@ -123,7 +123,7 @@ Return:
 '''
 def from_heading_in_ned_frame(heading_as_frd, right_slope_angle, is_degree,
                               rot_seq = ATT_ROT_SEQ_IN_NED_FRAME):
-  rot = RotEx.from_axisX_2_vector(heading_as_frd, -right_slope_angle, is_degree)
+  rot = RotEx.from_x_axis_2_vector(heading_as_frd, -right_slope_angle, is_degree)
 
   frd_in_ned_frame = rot.as_euler(rot_seq, is_degree)
   logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
