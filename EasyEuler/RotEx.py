@@ -86,6 +86,41 @@ def _analyze_vector_and_angle_against_xy_plane(v, angle_crossv_and_xy_plane):
   return is_possible, angle_v_and_xy_plane, angle_self_roll, max_angle_crossv_and_xy_plane
 
 '''
+Get rotation from x-axis to a vector and with y-axis slope angle.
+
+Args:
+  v: a target vector coming from x-axis
+  y-axis_slope_angle: the slope angle of rotated y-axis
+  is_degree: True is degree and False is radian for input y-axis_slope_angle
+Return:
+  rotation from x-axis to the vector with y-axis slope angle
+Raise:
+  ValueError: If it is impossible to rotate to the vector with the slope angle
+'''
+def from_x_axis_2_vector(v, y_axis_slope_angle, is_degree):
+  roll_z = math.atan2(v[1], v[0])
+  roll_y = 0
+  roll_x = 0
+
+  if is_degree:
+    y_axis_slope_angle = np.deg2rad(y_axis_slope_angle)
+
+  (is_possible, roll_y, angle_self_roll, max_slope_angle) = _analyze_vector_and_angle_against_xy_plane(v, y_axis_slope_angle)
+  if is_possible:
+    roll_x = angle_self_roll
+  else:
+    if is_degree:
+      max_slope_angle = np.rad2deg(max_slope_angle)
+
+    raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (y_axis_slope_angle, -max_slope_angle, max_slope_angle))
+
+  euler_r_ZYX = np.array([roll_z, -roll_y, roll_x])
+  logger.info('euler(rad) in ZYX sequence: %s' % euler_r_ZYX)
+  rot = Rotation.from_euler('ZYX', euler_r_ZYX, False)
+
+  return rot
+
+'''
 Get rotation from y-axis to a vector and with x-axis slope angle.
 
 Args:
@@ -122,74 +157,28 @@ def from_y_axis_2_vector(v, x_axis_slope_angle, is_degree):
   return rot
 
 '''
-Get rotation from x-axis to a vector and with y-axis slope angle.
-
-Args:
-  v: a target vector coming from x-axis
-  y-axis_slope_angle: the slope angle of rotated y-axis
-  is_degree: True is degree and False is radian for input y-axis_slope_angle
-Return:
-  rotation from x-axis to the vector with y-axis slope angle
-Raise:
-  ValueError: If it is impossible to rotate to the vector with the slope angle
-'''
-def from_x_axis_2_vector(v, y_axis_slope_angle, is_degree):
-  roll_z = math.atan2(v[1], v[0])
-  roll_y = 0
-  roll_x = 0
-
-  if is_degree:
-    y_axis_slope_angle = np.deg2rad(y_axis_slope_angle)
-
-  (is_possible, roll_y, angle_self_roll, max_slope_angle) = _analyze_vector_and_angle_against_xy_plane(v, y_axis_slope_angle)
-  if is_possible:
-    roll_x = angle_self_roll
-  else:
-    if is_degree:
-      max_slope_angle = np.rad2deg(max_slope_angle)
-
-    raise ValueError('It is impossible to rotate to the vector with %s slope angle. Possible slope angle should be between [%s, %s] ' % (y_axis_slope_angle, -max_slope_angle, max_slope_angle))
-
-  euler_r_ZYX = np.array([roll_z, -roll_y, roll_x])
-  logger.info('euler(rad) in ZYX sequence: %s' % euler_r_ZYX)
-  rot = Rotation.from_euler('ZYX', euler_r_ZYX, False)
-
-  return rot
-
-'''
   World frame definition(xyz coordinates):
     ENU (East, North, Up)
     NED (North, East, Down)
 
-  NED_2_ENU and ENU_2_NED are actually the same rotation.
-  So define NED_X_ENU which means to exchange each other, whose rotation sequence is selected as 'ZYX'
+  ENU_2_NED and NED_2_ENU are actually the same rotation.
+  So define ENU_X_NED which means to exchange each other, whose rotation sequence is selected as 'ZYX'
 '''
-EULER_D_NED_X_ENU = np.array([-90, 180, 0])
-EULER_R_NED_X_ENU = np.deg2rad(EULER_D_NED_X_ENU)
+EULER_D_ENU_X_NED = np.array([-90, 180, 0])
+EULER_R_ENU_X_NED = np.deg2rad(EULER_D_ENU_X_NED)
 
-ROT_NED_X_ENU = Rotation.from_euler('ZYX', EULER_R_NED_X_ENU, False)
-
-'''
-Get frame rotation of exchange between NED and ENU since they are same rotation.
-
-Args:
-  none
-Return:
-  frame rotation of exchange between NED and ENU
-'''
-def ned_x_enu():
-  return ROT_NED_X_ENU
+ROT_ENU_X_NED = Rotation.from_euler('ZYX', EULER_R_ENU_X_NED, False)
 
 '''
-Get frame rotation from NED to ENU.
+Get frame rotation of exchange between ENU and NED since they are same rotation.
 
 Args:
   none
 Return:
-  frame rotation from NED to ENU
+  frame rotation of exchange between ENU and NED
 '''
-def from_ned_2_enu():
-  return ROT_NED_X_ENU
+def enu_x_ned():
+  return ROT_ENU_X_NED
 
 '''
 Get frame rotation from ENU to NED.
@@ -200,7 +189,18 @@ Return:
   frame rotation from ENU to NED
 '''
 def from_enu_2_ned():
-  return ROT_NED_X_ENU
+  return ROT_ENU_X_NED
+
+'''
+Get frame rotation from NED to ENU.
+
+Args:
+  none
+Return:
+  frame rotation from NED to ENU
+'''
+def from_ned_2_enu():
+  return ROT_ENU_X_NED
 
 '''
 Get delta rotation from rot1 to rot2 in the same frame.

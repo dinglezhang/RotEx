@@ -26,7 +26,7 @@ ATT_ROT_SEQ_IN_ENU_FRAME = 'ZXY'
 ATT_ROT_SEQ_IN_NED_FRAME = 'ZYX'
 
 '''
-Get attitude exchange between NED and ENU.
+Get attitude exchange between ENU and NED.
 
 Args:
   att_in_old_frame: attitude in old frame
@@ -37,33 +37,12 @@ Return:
   [0]: rotation in new frame
   [1]: attitude in new frame
 '''
-def change_frame_ned_x_enu(att_in_old_frame, is_degree, rot_seq_in_old_frame, rot_seq_in_new_frame):
+def change_frame_enu_x_ned(att_in_old_frame, is_degree, rot_seq_in_old_frame, rot_seq_in_new_frame):
   rot_in_old_frame = Rotation.from_euler(rot_seq_in_old_frame, att_in_old_frame, is_degree)
-  rot_in_new_frame = RotEx.get_rot_in_new_frame(rot_in_old_frame, RotEx.ned_x_enu())
+  rot_in_new_frame = RotEx.get_rot_in_new_frame(rot_in_old_frame, RotEx.enu_x_ned())
   att_in_new_frame = rot_in_new_frame.as_euler(rot_seq_in_new_frame, is_degree)
 
   return rot_in_new_frame, att_in_new_frame
-
-'''
-Get attitude RFU in ENU frame from it(FRD) in NED frame.
-
-Args:
-  frd_in_ned_frame: attitude FRD in NED frame
-  is_degree: True is degree and False is radian for both input and output attitudes
-  rot_seq_in_ned_frame: rotation sequence in NED frame, ZYX by default
-  rot_seq_in_enu_frame: rotation sequence in ENU frame, ZXY by default
-Return:
-  [0]: rotation in ENU frame
-  [1]: attitude RFU in ENU frame
-'''
-def change_frame_ned_2_enu(frd_in_ned_frame, is_degree,
-                           rot_seq_in_ned_frame = ATT_ROT_SEQ_IN_NED_FRAME, rot_seq_in_enu_frame = ATT_ROT_SEQ_IN_ENU_FRAME):
-  logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
-
-  (rot_in_enu_frame, rfu_in_enu_frame) = change_frame_ned_x_enu(frd_in_ned_frame, is_degree, rot_seq_in_ned_frame, rot_seq_in_enu_frame)
-  logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
-
-  return rot_in_enu_frame, rfu_in_enu_frame
 
 '''
 Get attitude FRD in NED frame from it(RFU) in ENU frame.
@@ -81,10 +60,31 @@ def change_frame_enu_2_ned(rfu_in_enu_frame, is_degree,
                            rot_seq_in_enu_frame = ATT_ROT_SEQ_IN_ENU_FRAME, rot_seq_in_ned_frame = ATT_ROT_SEQ_IN_NED_FRAME):
   logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
 
-  (rot_in_ned_frame, frd_in_ned_frame) = change_frame_ned_x_enu(rfu_in_enu_frame, is_degree, rot_seq_in_enu_frame, rot_seq_in_ned_frame)
+  (rot_in_ned_frame, frd_in_ned_frame) = change_frame_enu_x_ned(rfu_in_enu_frame, is_degree, rot_seq_in_enu_frame, rot_seq_in_ned_frame)
   logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
 
   return rot_in_ned_frame, frd_in_ned_frame
+
+'''
+Get attitude RFU in ENU frame from it(FRD) in NED frame.
+
+Args:
+  frd_in_ned_frame: attitude FRD in NED frame
+  is_degree: True is degree and False is radian for both input and output attitudes
+  rot_seq_in_ned_frame: rotation sequence in NED frame, ZYX by default
+  rot_seq_in_enu_frame: rotation sequence in ENU frame, ZXY by default
+Return:
+  [0]: rotation in ENU frame
+  [1]: attitude RFU in ENU frame
+'''
+def change_frame_ned_2_enu(frd_in_ned_frame, is_degree,
+                           rot_seq_in_ned_frame = ATT_ROT_SEQ_IN_NED_FRAME, rot_seq_in_enu_frame = ATT_ROT_SEQ_IN_ENU_FRAME):
+  logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
+
+  (rot_in_enu_frame, rfu_in_enu_frame) = change_frame_enu_x_ned(frd_in_ned_frame, is_degree, rot_seq_in_ned_frame, rot_seq_in_enu_frame)
+  logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
+
+  return rot_in_enu_frame, rfu_in_enu_frame
 
 '''
 Get attitude RFU in ENU frame by heading with right slope angle.
