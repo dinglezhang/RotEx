@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from numpy.testing import assert_allclose
 
-from EasyEuler import rotate_vectors
+from RotEx import rotate_vectors
 
 def single_test_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expected, on_frame):
   vectors_rotated = rotate_vectors.rotate_vectors(vectors, rot, 1, on_frame)

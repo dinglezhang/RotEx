@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from . import utils
-from . import RotEx
+from . import rotex
 
 logger = utils.get_logger()
 
@@ -39,7 +39,7 @@ Return:
 '''
 def change_frame_enu_x_ned(att_in_old_frame, is_degree, rot_seq_in_old_frame, rot_seq_in_new_frame):
   rot_in_old_frame = Rotation.from_euler(rot_seq_in_old_frame, att_in_old_frame, is_degree)
-  rot_in_new_frame = RotEx.get_rot_in_new_frame(rot_in_old_frame, RotEx.enu_x_ned())
+  rot_in_new_frame = rotex.get_rot_in_new_frame(rot_in_old_frame, rotex.enu_x_ned())
   att_in_new_frame = rot_in_new_frame.as_euler(rot_seq_in_new_frame, is_degree)
 
   return rot_in_new_frame, att_in_new_frame
@@ -101,7 +101,7 @@ Return:
 '''
 def from_heading_in_enu_frame(heading_as_rfu, right_slope_angle, is_degree,
                               rot_seq = ATT_ROT_SEQ_IN_ENU_FRAME):
-  rot = RotEx.from_y_axis_2_vector(heading_as_rfu, right_slope_angle, is_degree)
+  rot = rotex.from_y_axis_2_vector(heading_as_rfu, right_slope_angle, is_degree)
 
   rfu_in_enu_frame = rot.as_euler(rot_seq, is_degree)
   logger.info('attitude RFU(%s) in ENU frame: %s' % (utils.get_angular_unit(is_degree), rfu_in_enu_frame))
@@ -123,7 +123,7 @@ Return:
 '''
 def from_heading_in_ned_frame(heading_as_frd, right_slope_angle, is_degree,
                               rot_seq = ATT_ROT_SEQ_IN_NED_FRAME):
-  rot = RotEx.from_x_axis_2_vector(heading_as_frd, -right_slope_angle, is_degree)
+  rot = rotex.from_x_axis_2_vector(heading_as_frd, -right_slope_angle, is_degree)
 
   frd_in_ned_frame = rot.as_euler(rot_seq, is_degree)
   logger.info('attitude FRD(%s) in NED frame: %s' % (utils.get_angular_unit(is_degree), frd_in_ned_frame))
@@ -153,7 +153,7 @@ def get_delta_att(att1, att2, rot_seq, is_degree, in_world_frame):
   rot1 = Rotation.from_euler(rot_seq, att1, is_degree)
   rot2 = Rotation.from_euler(rot_seq, att2, is_degree)
 
-  delta_rot = RotEx.get_delta_rot(rot1, rot2, in_world_frame)
+  delta_rot = rotex.get_delta_rot(rot1, rot2, in_world_frame)
 
   delta_euler = delta_rot.as_euler(rot_seq, is_degree)
   logger.info('delta euler(%s) in %s sequence: %s' % (rot_seq, angular_unit, delta_euler))
@@ -176,6 +176,6 @@ Return:
 '''
 def calc_angular_velocity(att1, att2, rot_seq, is_degree, delta_time, in_world_frame):
   delta_rot = get_delta_att(att1, att2, rot_seq, is_degree, in_world_frame)[0]
-  (angular_velocity, angular_rate) = RotEx.calc_angular_velocity(delta_rot, delta_time, is_degree)
+  (angular_velocity, angular_rate) = rotex.calc_angular_velocity(delta_rot, delta_time, is_degree)
 
   return angular_velocity, angular_rate

@@ -4,9 +4,9 @@ import numpy as np
 from numpy.testing import assert_allclose
 from scipy.spatial.transform import Rotation, RotationSpline
 
-from EasyEuler import utils
-from EasyEuler import RotEx
-from EasyEuler import attitude
+from RotEx import utils
+from RotEx import rotex
+from RotEx import attitude
 
 from . import test_rotate_vectors
 
@@ -34,7 +34,7 @@ def test_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame)
                          np.array([-1, 2, 0.5])])
 @pytest.mark.parametrize('right_slope_angle_d', [0, 15, 45, -30])
 def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
-  is_possible = RotEx._analyze_vector_and_angle_against_xy_plane(heading_as_rfu, np.deg2rad(right_slope_angle_d))[0]
+  is_possible = rotex._analyze_vector_and_angle_against_xy_plane(heading_as_rfu, np.deg2rad(right_slope_angle_d))[0]
 
   if not is_possible:
     with pytest.raises(ValueError,  match='It is impossible to rotate to the vector'):
@@ -61,7 +61,7 @@ def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
                          np.array([-1, 2, 0.5])])
 @pytest.mark.parametrize('right_slope_angle_d', [0, 15, 45, -30])
 def test_from_heading_in_ned_frame(heading_as_frd, right_slope_angle_d):
-  is_possible = RotEx._analyze_vector_and_angle_against_xy_plane(heading_as_frd, np.deg2rad(right_slope_angle_d))[0]
+  is_possible = rotex._analyze_vector_and_angle_against_xy_plane(heading_as_frd, np.deg2rad(right_slope_angle_d))[0]
 
   if not is_possible:
     with pytest.raises(ValueError,  match='It is impossible to rotate to the vector'):

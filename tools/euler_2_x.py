@@ -5,7 +5,7 @@ from numpy.testing import assert_allclose
 from scipy.spatial.transform import Rotation
 
 sys.path.append('..\\')
-from EasyEuler import utils
+from RotEx import utils
 
 '''
 Print all kinds of expression of a rotation by rotation.

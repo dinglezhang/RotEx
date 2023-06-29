@@ -252,7 +252,7 @@ Args:
   is_degree: True is degree and False is radian for output augular velocity
 Return:
   [0]: angular velocity, which is a vecotr
-  [1]: angular rate, which is a number
+  [1]: angular rate, which is a scalar
 '''
 def calc_angular_velocity(rot, delta_time, is_degree):
   rotvec = rot.as_rotvec()
