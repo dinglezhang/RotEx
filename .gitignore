@@ -6,3 +6,7 @@
 # python
 __pycache__/
 *.pyc
+
+# build and installation
+build/
+RotEx.egg-info/

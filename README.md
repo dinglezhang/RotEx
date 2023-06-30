@@ -6,10 +6,10 @@ You can learn, understand and test Rotation quickly, and use these functions in 
 It includes:
 - **rotex**, the core of module, as an extension of _scipy.spatial.transform.Rotation_. It provides basic algrithm from mathematics perspective.
 - **attitude, rotate_vectors** ..., providing some functions for all kinds of applications of rotation from application perspective.
-- **tests**, pytest functions for the above.
-- **tools**, some tools.
+- **tests**, pytest functions for the above, for dev only.
+- **tools**, some tools, for dev only.
 
-**Make Euler Angles easy, not dizzy!**
+**Make rotation easy, not dizzy!**
 
 # Dependencies
 
