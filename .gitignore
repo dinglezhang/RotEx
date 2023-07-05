@@ -8,7 +8,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-# build and distrubition
+# build and publish
 build/
 RotEx.egg-info/
 dist/
