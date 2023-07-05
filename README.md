@@ -12,6 +12,8 @@ It includes:
 
 Please see the comments above all functions in source code to get details.
 
+Please ref to ./tests/* code to get some examples to call these functions.
+
 **Make rotation easy, not dizzy!**
 
 ## Dependencies
@@ -27,7 +29,7 @@ Please see the comments above all functions in source code to get details.
   ```bash
   pip install RotEx
   ```
-  
+
 - Install from the source:
 
   ```bash
@@ -51,4 +53,4 @@ Please see the comments above all functions in source code to get details.
 
 - Try test RotEx (only for from source)
 
-Run test.py in the root. It calls tests on all functions provided in RotEx folder.
+  Run test.py in the root. It calls tests on all functions provided in RotEx folder.
