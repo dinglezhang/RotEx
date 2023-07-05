@@ -19,6 +19,7 @@ setup(
     extras_require={"dev": ['pytest']},
     packages=find_packages(exclude=["tests*"]),
 
+    keywords=["euler-angles", "attitude", "rotation", "3d-rotation", "rotation-extension", "rotation-help"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

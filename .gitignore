@@ -1,12 +1,14 @@
 !.gitignore
 
-# visual studio files
-/.vscode/
+# IDE files
+.vscode/
 
-# python
+# python and pytest
 __pycache__/
 *.pyc
+.pytest_cache/
 
-# build and installation
+# build and distrubition
 build/
 RotEx.egg-info/
+dist/
