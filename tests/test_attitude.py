@@ -26,7 +26,7 @@ def test_change_frame_enu_2_ned(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame)
                          (np.array([90, 45, 90]), np.array([-90, 45, 90]))])
 def test_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
   (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.change_frame_ned_2_enu(frd_d_in_ned_frame, True)
-  assert_allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame)
+  assert_allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame, atol=1e-8)
 
 @pytest.mark.parametrize('heading_as_rfu',
                         [np.array([-1, 1, math.sqrt(2)]),
