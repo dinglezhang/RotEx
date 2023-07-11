@@ -269,3 +269,19 @@ def calc_angular_velocity(rot, delta_time, is_degree):
     logger.info('angular rate(deg): %s' % angular_rate)
 
   return angular_velocity, angular_rate
+
+'''
+Calculate linear velocity for vectors by rotation and delta time.
+
+Args:
+  rot: the rotation
+  vectors: vectors to be rotated
+  delta_time: time cost for the rotation
+Return:
+  linear velocity of the vectors
+'''
+def calc_linear_velocity(rot, vectors, delta_time):
+  angular_velocity = calc_angular_velocity(rot, delta_time, False)[0]
+  linear_velocity = np.cross(angular_velocity, vectors)
+
+  return linear_velocity
