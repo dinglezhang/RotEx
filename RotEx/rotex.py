@@ -244,6 +244,32 @@ def get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame):
   return rot_in_new_frame
 
 '''
+Calculate rotation angle.
+
+Args:
+  rot: the rotation
+  is_degree: True is degree and False is radian for output augular velocity
+Return:
+  [0]: rotation angle vector
+  [1]: rotation angle scalar
+'''
+def calc_rot_angle(rot, is_degree):
+  rotvec = rot.as_rotvec()
+  logger.info('rotvec: %s' % rotvec)
+
+  rot_angle_vector = rotvec
+  rot_angle_scalar = np.linalg.norm(rot_angle_vector)
+  logger.info('rotation angle vector(rad): %s' % rot_angle_vector)
+  logger.info('rotation angle scalar(rad): %s' % rot_angle_scalar)
+  if is_degree:
+    rot_angle_vector = np.rad2deg(rot_angle_vector)
+    rot_angle_scalar = np.rad2deg(rot_angle_scalar)
+    logger.info('rotation angle vector(deg): %s' % rot_angle_vector)
+    logger.info('rotation angle scalar(deg): %s' % rot_angle_scalar)
+
+  return rot_angle_vector, rot_angle_scalar
+
+'''
 Calculate angular velocity by rotation and delta time.
 
 Args:
@@ -255,20 +281,32 @@ Return:
   [1]: angular rate, which is a scalar
 '''
 def calc_angular_velocity(rot, delta_time, is_degree):
-  rotvec = rot.as_rotvec()
-  logger.info('rotvec: %s' % rotvec)
+  (rot_angle_vector, rot_angle_scalar) = calc_rot_angle(rot, is_degree)
 
-  angular_velocity = rotvec / delta_time
-  angular_rate = np.linalg.norm(angular_velocity)
-  logger.info('angular velocity(rad): %s' % angular_velocity)
-  logger.info('angular rate(rad): %s' % angular_rate)
-  if is_degree:
-    angular_velocity = np.rad2deg(angular_velocity)
-    angular_rate = np.rad2deg(angular_rate)
-    logger.info('angular velocity(deg): %s' % angular_velocity)
-    logger.info('angular rate(deg): %s' % angular_rate)
+  angular_velocity = rot_angle_vector / delta_time
+  angular_rate = rot_angle_scalar / delta_time
+  angular_unit = utils.get_angular_unit(is_degree)
+  logger.info('angular velocity(%s): %s' % (angular_unit, angular_velocity))
+  logger.info('angular rate(%s): %s' % (angular_unit, angular_rate))
 
   return angular_velocity, angular_rate
+
+'''
+Calculate linear displacement for vectors by rotation.
+
+Args:
+  rot: the rotation
+  vectors: vectors to be rotated
+Return:
+  [0]: linear displacement vectors
+  [1]: linear displacement values
+'''
+def calc_linear_displacement(rot, vectors):
+  rot_angle_vector = calc_rot_angle(rot, False)[0]
+  linear_displacement_vectors = np.cross(rot_angle_vector, vectors)
+  linear_displacement_values = np.linalg.norm(linear_displacement_vectors)
+
+  return linear_displacement_vectors, linear_displacement_values
 
 '''
 Calculate linear velocity for vectors by rotation and delta time.
@@ -278,10 +316,12 @@ Args:
   vectors: vectors to be rotated
   delta_time: time cost for the rotation
 Return:
-  linear velocity of the vectors
+  [0]: linear velocities, , which are vectors
+  [1]: linear rates, , which are scalars
 '''
 def calc_linear_velocity(rot, vectors, delta_time):
-  angular_velocity = calc_angular_velocity(rot, delta_time, False)[0]
-  linear_velocity = np.cross(angular_velocity, vectors)
+  (linear_displacement_vectors, linear_displacement_values) = calc_linear_displacement(rot, vectors)
+  linear_velocities = linear_displacement_vectors / delta_time
+  linear_rates = linear_displacement_values / delta_time
 
-  return linear_velocity
+  return linear_velocities, linear_rates

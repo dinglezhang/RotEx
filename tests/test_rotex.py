@@ -49,7 +49,7 @@ def test_get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame, vector_samp
                          Rotation.from_euler('ZYX', np.array([-0.2, -0.1, 0.3]), True)])
 @pytest.mark.parametrize('delta_time', [1, 2, 3])
 def test_calc_linear_velocity_with_small_angle(rot, vector_samples, delta_time):
-  linear_velocity = rotex.calc_linear_velocity(rot, vector_samples, delta_time)
+  linear_velocity = rotex.calc_linear_velocity(rot, vector_samples, delta_time)[0]
 
   vectors_rotated= rot.apply(vector_samples)
   approx_linear_vellcity = (vectors_rotated - vector_samples) / delta_time
