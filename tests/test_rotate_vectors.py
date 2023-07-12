@@ -43,7 +43,7 @@ def single_test_rotate_vectors_once_by_rot(vectors, rot, vectors_rotated_expecte
                                 ]), True)])
 def test_rotate_vectors_once(vectors, euler_d, rot_seq, vectors_rotated_expected, on_frame):
   vectors_rotated = rotate_vectors.rotate_vectors_by_euler(vectors, euler_d, rot_seq, True, 1, on_frame)
-  assert_allclose(vectors_rotated, vectors_rotated_expected, atol=1e-8)
+  assert_allclose(vectors_rotated, vectors_rotated_expected, atol = 1e-8)
 
 @pytest.mark.parametrize('euler_d', [np.array([3, 3, 3])])
 @pytest.mark.parametrize('rot_seq', ['ZYX', 'zyx'])

@@ -30,7 +30,7 @@ def rot_2_x(rot, is_degree):
   norm_rotvec = np.linalg.norm(rotvec)
   norm_mrp = np.linalg.norm(mrp)
 
-  assert_allclose(cross_rotvec_mrp, [0, 0, 0], atol=1e-8)        # the two are parallel
+  assert_allclose(cross_rotvec_mrp, [0, 0, 0], atol = 1e-8)        # the two are parallel
   assert_allclose(math.tan(norm_rotvec/4), norm_mrp)  # angle relation
 
   if is_degree:

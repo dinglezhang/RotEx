@@ -15,7 +15,7 @@ logger.setLevel('INFO')
 #logger.setLevel('WARNING')
 
 handler = logging.StreamHandler()
-fmtr = logging.Formatter(fmt="[%(asctime)s][%(filename)s:%(lineno)d][%(funcName)s()][%(levelname)s]: %(message)s")
+fmtr = logging.Formatter(fmt = "[%(asctime)s][%(filename)s:%(lineno)d][%(funcName)s()][%(levelname)s]: %(message)s")
 handler.setFormatter(fmtr)
 logger.addHandler(handler)
 

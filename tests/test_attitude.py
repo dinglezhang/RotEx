@@ -17,7 +17,7 @@ from . import test_rotate_vectors
                          (np.array([-90, 45, 90]), np.array([90, 45, 90]))])
 def test_change_frame_enu_2_ned(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame):
   (rot_in_ned_frame, frd_d_in_ned_frame) = attitude.change_frame_enu_2_ned(rfu_d_in_enu_frame, True)
-  assert_allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame, atol=1e-8)
+  assert_allclose(frd_d_in_ned_frame, expected_rfu_d_in_enu_frame, atol = 1e-8)
 
 @pytest.mark.parametrize('frd_d_in_ned_frame, expected_frd_d_in_ned_frame',
                         [(np.array([45, 0, 0]), np.array([-45, 0, 0])),
@@ -26,7 +26,7 @@ def test_change_frame_enu_2_ned(rfu_d_in_enu_frame, expected_rfu_d_in_enu_frame)
                          (np.array([90, 45, 90]), np.array([-90, 45, 90]))])
 def test_change_frame_ned_2_enu(frd_d_in_ned_frame, expected_frd_d_in_ned_frame):
   (rot_in_enu_frame, rfu_d_in_enu_frame) = attitude.change_frame_ned_2_enu(frd_d_in_ned_frame, True)
-  assert_allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame, atol=1e-8)
+  assert_allclose(rfu_d_in_enu_frame, expected_frd_d_in_ned_frame, atol = 1e-8)
 
 @pytest.mark.parametrize('heading_as_rfu',
                         [np.array([-1, 1, math.sqrt(2)]),
@@ -53,7 +53,7 @@ def test_from_heading_in_enu_frame(heading_as_rfu, right_slope_angle_d):
     right_end = rot.apply(right_start)
     right_slope_angle_result = utils.calc_angle_between_vector_and_xy_plane(right_end, True)
 
-    assert_allclose(right_slope_angle_result, right_slope_angle_d, atol=1e-8)
+    assert_allclose(right_slope_angle_result, right_slope_angle_d, atol = 1e-8)
 
 @pytest.mark.parametrize('heading_as_frd',
                         [np.array([-1, 1, math.sqrt(2)]),
@@ -80,7 +80,7 @@ def test_from_heading_in_ned_frame(heading_as_frd, right_slope_angle_d):
     right_end = rot.apply(right_start)
     right_slope_angle_result = -utils.calc_angle_between_vector_and_xy_plane(right_end, True)
 
-    assert_allclose(right_slope_angle_result, right_slope_angle_d, atol=1e-8)
+    assert_allclose(right_slope_angle_result, right_slope_angle_d, atol = 1e-8)
 
 @pytest.mark.parametrize('att_d_1', [np.array([10, 1, 4])])
 @pytest.mark.parametrize('att_d_2', [np.array([11, 2, 5])])

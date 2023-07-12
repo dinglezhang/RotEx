@@ -43,17 +43,39 @@ def test_get_rot_in_new_frame(rot_in_old_frame, rot_old_2_new_frame, vector_samp
   assert_allclose(vectors_rotated_in_new_frame, vectors_rotated_in_new_frame_expected)
 
 @pytest.mark.parametrize('rot',
+                        [Rotation.from_euler('ZYX', np.array([1, 2, 3]), True),
+                         Rotation.from_euler('ZYX', np.array([-1, 2, -3]), True),
+                         Rotation.from_euler('ZYX', np.array([3, -2, 10]), True),
+                         Rotation.from_euler('ZYX', np.array([-10, -1, 3]), True)])
+def test_calc_linear_displacement(rot, vector_samples):
+  linear_displacement_scalars = rotex.calc_linear_displacement(rot, vector_samples)[1]
+
+  rot_axis = rot.as_rotvec()
+  rot_axis = rot_axis / np.linalg.norm(rot_axis)
+  rot_angle = rot.magnitude()
+
+  vectors_rotated= rot.apply(vector_samples)
+  normals = np.cross(vector_samples, vectors_rotated)
+  normals = normals / np.linalg.norm(normals, axis = 1)[:, np.newaxis]
+
+  angles = np.arccos(np.dot(normals, rot_axis))
+  vector_norms = np.linalg.norm(vector_samples, axis = 1)
+  linear_displacement_scalars_expected = vector_norms * np.cos(angles) * rot_angle  # [ToDo] make sure it is right
+
+  assert_allclose(linear_displacement_scalars, linear_displacement_scalars_expected, atol = 1e-2)
+
+@pytest.mark.parametrize('rot',
                         [Rotation.from_euler('ZYX', np.array([0.1, 0.2, 0.3]), True),
                          Rotation.from_euler('ZYX', np.array([-0.1, 0.2, -0.3]), True),
                          Rotation.from_euler('ZYX', np.array([0.3, -0.2, 0.1]), True),
                          Rotation.from_euler('ZYX', np.array([-0.2, -0.1, 0.3]), True)])
 @pytest.mark.parametrize('delta_time', [1, 2, 3])
 def test_calc_linear_velocity_with_small_angle(rot, vector_samples, delta_time):
-  linear_velocity = rotex.calc_linear_velocity(rot, vector_samples, delta_time)[0]
+  linear_velocities = rotex.calc_linear_velocity(rot, vector_samples, delta_time)[0]
 
   vectors_rotated= rot.apply(vector_samples)
-  approx_linear_vellcity = (vectors_rotated - vector_samples) / delta_time
+  approx_linear_velocities = (vectors_rotated - vector_samples) / delta_time
 
-  assert_allclose(linear_velocity, approx_linear_vellcity, atol=1e-3)
+  assert_allclose(linear_velocities, approx_linear_velocities, atol = 1e-3)
 
 #tests on other RotEx functions are covered in other test modules, like test_attitude.py
