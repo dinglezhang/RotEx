@@ -326,3 +326,23 @@ def calc_linear_velocity(rot, vectors, delta_time):
   linear_rates = linear_displacement_scalars / delta_time
 
   return linear_velocities, linear_rates
+
+'''
+Calculate centripetal acceleration for vectors by rotation and delta time.
+
+Args:
+  rot: the rotation
+  vectors: vectors to be rotated
+  delta_time: time cost for the rotation
+Return:
+  [0]: centripetal acceleration vectors
+  [1]: centripetal acceleration scalars
+'''
+def calc_centripetal_acceleration(rot, vectors, delta_time):
+  angular_velocity = calc_angular_velocity(rot, delta_time, False)[0]
+  linear_velocities = calc_linear_velocity(rot, vectors, delta_time)[0]
+
+  centripetal_acceleration_vectors = np.cross(angular_velocity, linear_velocities)
+  centripetal_acceleration_scalars = np.linalg.norm(centripetal_acceleration_vectors, axis = 1)
+
+  return centripetal_acceleration_vectors, centripetal_acceleration_scalars

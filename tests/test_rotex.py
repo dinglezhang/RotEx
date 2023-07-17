@@ -78,4 +78,20 @@ def test_calc_linear_velocity_with_small_angle(rot, vector_samples, delta_time):
 
   assert_allclose(linear_velocities, approx_linear_velocities, atol = 1e-3)
 
+@pytest.mark.parametrize('rot',
+                        [Rotation.from_euler('ZYX', np.array([1, 2, 3]), True),
+                         Rotation.from_euler('ZYX', np.array([-1, 2, -3]), True),
+                         Rotation.from_euler('ZYX', np.array([3, -2, 10]), True),
+                         Rotation.from_euler('ZYX', np.array([-10, -1, 3]), True)])
+@pytest.mark.parametrize('delta_time', [1, 2, 3])
+def test_calc_centripetal_acceleration(rot, vector_samples, delta_time):
+  centripetal_acceleration_vectors = rotex.calc_centripetal_acceleration(rot, vector_samples, delta_time)[0]
+  rot_axis = rot.as_rotvec()
+
+  # angles between centripetal_acceleration and rot_axis should be all 90 degrees
+  angles = np.arccos(np.dot(centripetal_acceleration_vectors, rot_axis) / (np.linalg.norm(rot_axis) * np.linalg.norm(centripetal_acceleration_vectors)))
+  assert_allclose(angles, np.full(vector_samples.shape[0], np.deg2rad(90)), atol = 1e-8)
+
+  # [ToDo] add more tests on calc_centripetal_acceleration(), how?
+
 #tests on other RotEx functions are covered in other test modules, like test_attitude.py
