@@ -3,8 +3,8 @@ from scipy.spatial.transform import Rotation, RotationSpline
 
 def try_spline():
   times = [0, 10, 20, 40]
-  angles = [[-10, 20, 30], [0, 15, 40], [-30, 45, 30], [20, 45, 90]]
-  rotations = Rotation.from_euler('XYZ', angles, degrees = True)
+  attitudes = [[-10, 20, 30], [0, 15, 40], [-30, 45, 30], [20, 45, 90]]
+  rotations = Rotation.from_euler('XYZ', attitudes, degrees = True)
 
   spline = RotationSpline(times, rotations)
 

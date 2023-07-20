@@ -321,9 +321,10 @@ Return:
   [1]: linear rates, which are scalars
 '''
 def calc_linear_velocity(rot, vectors, delta_time):
-  (linear_displacement_vectors, linear_displacement_scalars) = calc_linear_displacement(rot, vectors)
-  linear_velocities = linear_displacement_vectors / delta_time
-  linear_rates = linear_displacement_scalars / delta_time
+  angular_velocity = calc_angular_velocity(rot, delta_time, False)[0]
+
+  linear_velocities = np.cross(angular_velocity, vectors)
+  linear_rates = np.linalg.norm(linear_velocities, axis = 1)
 
   return linear_velocities, linear_rates
 
@@ -340,9 +341,8 @@ Return:
 '''
 def calc_centripetal_acceleration(rot, vectors, delta_time):
   angular_velocity = calc_angular_velocity(rot, delta_time, False)[0]
-  linear_velocities = calc_linear_velocity(rot, vectors, delta_time)[0]
 
-  centripetal_acceleration_vectors = np.cross(angular_velocity, linear_velocities)
+  centripetal_acceleration_vectors = np.cross(angular_velocity, np.cross(angular_velocity, vectors))
   centripetal_acceleration_scalars = np.linalg.norm(centripetal_acceleration_vectors, axis = 1)
 
   return centripetal_acceleration_vectors, centripetal_acceleration_scalars

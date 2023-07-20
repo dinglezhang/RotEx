@@ -73,18 +73,19 @@ def test_calc_linear_displacement(rot, vector_samples):
 def test_calc_linear_velocity_with_small_angle(rot, vector_samples, delta_time):
   linear_velocities = rotex.calc_linear_velocity(rot, vector_samples, delta_time)[0]
 
-  vectors_rotated= rot.apply(vector_samples)
-  approx_linear_velocities = (vectors_rotated - vector_samples) / delta_time
+  # calculate approx velocities by two vectors with small angle rotation
+  vectors_rotated = rot.apply(vector_samples)
+  linear_velocities_approx = (vectors_rotated - vector_samples) / delta_time
 
-  assert_allclose(linear_velocities, approx_linear_velocities, atol = 1e-3)
+  assert_allclose(linear_velocities, linear_velocities_approx, atol = 1e-3)
 
 @pytest.mark.parametrize('rot',
-                        [Rotation.from_euler('ZYX', np.array([1, 2, 3]), True),
-                         Rotation.from_euler('ZYX', np.array([-1, 2, -3]), True),
-                         Rotation.from_euler('ZYX', np.array([3, -2, 10]), True),
-                         Rotation.from_euler('ZYX', np.array([-10, -1, 3]), True)])
+                        [Rotation.from_euler('ZYX', np.array([0.1, 0.2, 0.3]), True),
+                         Rotation.from_euler('ZYX', np.array([-0.1, 0.2, -0.3]), True),
+                         Rotation.from_euler('ZYX', np.array([0.3, -0.2, 0.1]), True),
+                         Rotation.from_euler('ZYX', np.array([-0.2, -0.1, 0.3]), True)])
 @pytest.mark.parametrize('delta_time', [1, 2, 3])
-def test_calc_centripetal_acceleration(rot, vector_samples, delta_time):
+def test_calc_centripetal_acceleration_with_small_angle(rot, vector_samples, delta_time):
   centripetal_acceleration_vectors = rotex.calc_centripetal_acceleration(rot, vector_samples, delta_time)[0]
   rot_axis = rot.as_rotvec()
 
@@ -92,6 +93,13 @@ def test_calc_centripetal_acceleration(rot, vector_samples, delta_time):
   angles = np.arccos(np.dot(centripetal_acceleration_vectors, rot_axis) / (np.linalg.norm(rot_axis) * np.linalg.norm(centripetal_acceleration_vectors)))
   assert_allclose(angles, np.full(vector_samples.shape[0], np.deg2rad(90)), atol = 1e-8)
 
-  # [ToDo] add more tests on calc_centripetal_acceleration(), how?
+  # calculate approx acceleration by two vectors with small angle rotation
+  vectors_rotated_before = rot.inv().apply(vector_samples)
+  vectors_rotated_after = rot.apply(vector_samples)
+  linear_velocities_before = (vector_samples - vectors_rotated_before) / delta_time
+  linear_velocities_after = (vectors_rotated_after - vector_samples) / delta_time
+  centripetal_acceleration_vectors_approx = (linear_velocities_after - linear_velocities_before) / delta_time
+
+  assert_allclose(centripetal_acceleration_vectors, centripetal_acceleration_vectors_approx, atol = 1e-9)
 
 #tests on other RotEx functions are covered in other test modules, like test_attitude.py
