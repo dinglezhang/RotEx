@@ -30,8 +30,9 @@ heading_samples = \
 slope_angle_samples = [0, 15, 45, -30]
 
 att_d_smaples = \
-  [np.array([10, 1, 4]),
-   np.array([11, 2, 5])]
+  [np.array([10, -1, 4]),
+   np.array([11, -2, 5]),
+   np.array([12, -3, 6])]
 
 rot_seq_samples = ['ZYX', 'zyx']
 
@@ -135,19 +136,27 @@ def test_linear_delta_att(att_d_1, factor, rot_seq):
 
   assert_allclose(delta_euler_d, delta_euler_d_linear)
 
+@pytest.mark.parametrize('att_d_0', att_d_smaples)
 @pytest.mark.parametrize('att_d_1', att_d_smaples)
 @pytest.mark.parametrize('att_d_2', att_d_smaples)
 @pytest.mark.parametrize('rot_seq', rot_seq_samples)
 @pytest.mark.parametrize('delta_time', [2, 3])
-def test_calc_angular_velocity(att_d_1, att_d_2, rot_seq, delta_time):
-  angular_velocity = attitude.calc_angular_velocity(att_d_1, att_d_2, rot_seq, True, delta_time, False)[0]
+def test_calc_angular_velocity_acceleration(att_d_0, att_d_1, att_d_2, rot_seq, delta_time):
+  angular_velocity_1 = attitude.calc_angular_velocity(att_d_0, att_d_1, rot_seq, True, delta_time, False)[0]
+  angular_velocity_2 = attitude.calc_angular_velocity(att_d_1, att_d_2, rot_seq, True, delta_time, False)[0]
+  angular_acceleration = rotex.calc_angular_acceleration(angular_velocity_2, angular_velocity_1, delta_time)[0]
 
-  times = [0, delta_time]
-  angles = [att_d_1, att_d_2]
+  times = [0, delta_time, delta_time * 2]
+  angles = [att_d_0, att_d_1, att_d_2]
   rotations = Rotation.from_euler(rot_seq, angles, True)
-
   spline = RotationSpline(times, rotations)
-  angular_velocity_spline = spline(times, 1)[1]
-  angular_velocity_spline = np.rad2deg(angular_velocity_spline)
 
-  assert_allclose(angular_velocity, angular_velocity_spline, atol = 1e-8)
+  times = [0, delta_time * 2]
+  angular_velocity_spline = spline(times, 1)
+  angular_velocity_spline = np.rad2deg(angular_velocity_spline)
+  angular_acceleration_spline = spline(times, 2)
+  angular_acceleration_spline = np.rad2deg(angular_acceleration_spline)
+
+  assert_allclose(angular_velocity_1, angular_velocity_spline[0], atol = 1e-8)
+  assert_allclose(angular_velocity_2, angular_velocity_spline[1], atol = 1e-8)
+  assert_allclose(angular_acceleration, (angular_acceleration_spline[0] + angular_acceleration_spline[1])/2, atol = 1e-6)

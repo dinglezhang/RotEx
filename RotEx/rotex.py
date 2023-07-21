@@ -292,6 +292,25 @@ def calc_angular_velocity(rot, delta_time, is_degree):
   return angular_velocity, angular_rate
 
 '''
+Calculate angular acceleration by two angular velocities and delta time.
+[ToDo] So far it is just to get difference between two angular velocities and divide by delta time, temporarily.
+       Need to find a good way to decribe rot with changing angular velocity, then to calculate the angular acceleration.
+
+Args:
+  angular_velocity_1, angular_velocity_2: two angular velocities from 1 to 2
+  delta_time: time cost for the change of angular_velocity
+Return:
+  [0]: angular acceleration vector
+  [1]: angular acceleration scalar
+  whether accelerationis degree or not dependends on the input
+'''
+def calc_angular_acceleration(angular_velocity_1, angular_velocity_2, delta_time):
+  angular_acceleration_vector = (angular_velocity_2 - angular_velocity_1) / delta_time
+  angular_acceleration_scalar = np.linalg.norm(angular_acceleration_vector)
+
+  return angular_acceleration_vector, angular_acceleration_scalar
+
+'''
 Calculate linear displacement for vectors by rotation.
 
 Args:
