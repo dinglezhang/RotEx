@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setup(
     name = "RotEx",
-    version = "0.1.1",
+    version = "0.2.0",
     author = "dingle",
     author_email = "zhangdingh_2004@hotmail.com",
     description = "RotEx is a set of python helper functions to apply 3D rotation, especially Euler Angles, based on scipy.spatial.transform.Rotation",
